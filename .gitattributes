@@ -1,0 +1,11 @@
+# Mark documentation files
+*.md linguist-documentation
+
+# Mark JavaScript as primary language
+*.js linguist-language=JavaScript
+
+# Don't mark templates as vendored (include in language stats)
+templates/* linguist-vendored=false
+
+# Mark test files appropriately
+tests/* linguist-language=JavaScript
