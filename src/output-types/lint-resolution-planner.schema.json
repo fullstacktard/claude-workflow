@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "lint-resolution-planner-output",
+  "title": "Lint Resolution Planner Agent Output Schema",
+  "description": "JSON output schema for lint-resolution-planner agent. Extends agent-output-base.schema.json using allOf composition.",
+  "allOf": [
+    { "$ref": "../templates/.claude/schemas/agent-output-base.schema.json" }
+  ],
+  "type": "object",
+  "properties": {
+    "agent_type": {
+      "type": "string",
+      "enum": ["architecture"],
+      "description": "Type of agent - always 'architecture' for planner agents"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "failure", "partial", "blocked"],
+      "description": "Execution status"
+    },
+    "nextAction": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["spawn_agent", "wait", "complete"]
+        },
+        "agent_type": {
+          "type": "string",
+          "enum": ["implementation", "architecture", "review"]
+        },
+        "agent_name": { "type": "string" },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "payload": { "type": "object" }
+      },
+      "required": ["type"]
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "execution_time_ms": { "type": "number" },
+        "tools_used": { "type": "array", "items": { "type": "string" } },
+        "context_sources": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["execution_time_ms", "tools_used"]
+    },
+    "results": {
+      "type": "object",
+      "description": "Lint resolution planner specific results",
+      "properties": {
+        "agent_type": {
+          "type": "string",
+          "enum": ["architecture"]
+        },
+        "architecture_decisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "decision": { "type": "string" },
+              "rationale": { "type": "string" },
+              "alternatives_considered": { "type": "array", "items": { "type": "string" } },
+              "impact": { "type": "string" }
+            },
+            "required": ["decision", "rationale", "alternatives_considered", "impact"]
+          }
+        }
+      },
+      "required": ["agent_type", "architecture_decisions"]
+    }
+  }
+}

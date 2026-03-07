@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <!-- Lightning bolt - green/cyan neon -->
+  <g filter="url(#glow)">
+    <polygon points="36,4 16,34 28,34 24,60 48,26 34,26 40,4" fill="#4ade80" stroke="#22c55e" stroke-width="1"/>
+  </g>
+</svg>

@@ -1,0 +1,82 @@
+{
+  "version": "1.1.0",
+  "characters": {
+    "fullstacktard": {
+      "modelPath": "/models/medieval/rigged/jocker/jocker_rigged.glb",
+      "scale": 1.5,
+      "heightOffset": 0,
+      "animations": [
+        "/models/medieval/rigged/jocker/jocker_walk.glb",
+        "/models/medieval/rigged/jocker/jocker_run.glb"
+      ]
+    }
+  },
+  "buildings": {
+    "residence": {
+      "modelPath": "/models/medieval/buildings/cottage.glb",
+      "scale": 1.0
+    }
+  },
+  "props": {
+    "well": {
+      "modelPath": "/models/medieval/props/well.gltf",
+      "scale": 1.5
+    },
+    "bench": {
+      "modelPath": "/models/medieval/props/bench.gltf",
+      "scale": 1.0
+    },
+    "barrel": {
+      "modelPath": "/models/medieval/props/barrel.gltf",
+      "scale": 1.0
+    },
+    "crate": {
+      "modelPath": "/models/medieval/props/crate.gltf",
+      "scale": 1.0
+    },
+    "torch": {
+      "modelPath": "/models/medieval/props/torch.gltf",
+      "scale": 1.0
+    },
+    "anvil": {
+      "modelPath": "/models/medieval/props/anvil.gltf",
+      "scale": 1.0
+    },
+    "market-stall": {
+      "modelPath": "/models/medieval/props/market-stall.gltf",
+      "scale": 1.0
+    }
+  },
+  "toolStalls": {
+    "blacksmith": {
+      "stallType": "blacksmith",
+      "modelPath": "/models/medieval/props/market-stall.gltf",
+      "position": [-4, 0, 2],
+      "tools": ["Edit", "Write", "Bash", "Build"]
+    },
+    "scribe": {
+      "stallType": "scribe",
+      "modelPath": "/models/medieval/props/market-stall.gltf",
+      "position": [4, 0, 2],
+      "tools": ["Read", "documentation"]
+    },
+    "alchemist": {
+      "stallType": "alchemist",
+      "modelPath": "/models/medieval/props/market-stall.gltf",
+      "position": [-4, 0, -2],
+      "tools": ["context7", "exa", "research", "WebSearch"]
+    },
+    "map": {
+      "stallType": "map",
+      "modelPath": "/models/medieval/props/market-stall.gltf",
+      "position": [4, 0, -2],
+      "tools": ["serena", "Grep", "Glob", "Explore"]
+    },
+    "messenger": {
+      "stallType": "messenger",
+      "modelPath": "/models/medieval/props/market-stall.gltf",
+      "position": [0, 0, 4],
+      "tools": ["WebFetch", "Task"]
+    }
+  }
+}

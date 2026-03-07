@@ -1,0 +1,41 @@
+# claude-proxy configuration
+# This file is managed by claude-workflow CLI
+# Location: ~/.claude-workflow/claude-proxy-config.yaml
+
+version: 1
+
+# Routing Configuration
+# NOTE: agent_routing and model_routing are mutually exclusive
+# Only ONE can be enabled at a time
+routing:
+  # Agent routing: Routes requests to specialized agents based on task type
+  # When enabled, requests are analyzed and routed to appropriate agent workers
+  agent_routing: true
+
+  # Model routing: Routes requests to different LLM models based on task complexity
+  # When enabled, simple tasks go to fast models, complex tasks to powerful models
+  model_routing: false
+
+# Fallback Configuration
+# Used when routing fails or for unmatched requests
+fallback:
+  # Default model to use when routing is disabled or fails
+  default_model: "claude-sonnet-4-20250514"
+
+  # Request timeout in milliseconds
+  timeout_ms: 120000
+
+  # Number of retry attempts on transient failures
+  retry_attempts: 3
+
+  # Delay between retries in milliseconds
+  retry_delay_ms: 1000
+
+# Account Configuration
+# References the accounts file for multi-account support
+accounts:
+  # Path to accounts file (relative to ~/.claude-workflow/)
+  file: "claude-accounts.json"
+
+  # Default account to use (by email or index)
+  default: null

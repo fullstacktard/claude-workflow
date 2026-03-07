@@ -1,0 +1,326 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "surreal-clip-generator-output",
+  "title": "Surreal Clip Generator Agent Output Schema",
+  "description": "JSON output schema for the surreal-clip-generator agent. Extends agent-output-base.schema.json using allOf composition. Enables orchestration hooks to parse results, chain video generation into workflows, and validate consistent, machine-readable outputs.\n\nExample valid payload:\n{\n  \"agent_id\": \"video-gen-001\",\n  \"agent_type\": \"video-generation\",\n  \"timestamp\": \"2026-02-06T12:00:00.000Z\",\n  \"session_id\": \"sess_abc123\",\n  \"schema_version\": \"1.0.0\",\n  \"status\": \"success\",\n  \"generation_result\": {\n    \"job_id\": \"pred_abc123\",\n    \"provider\": \"replicate-luma\",\n    \"status\": \"succeeded\",\n    \"output_path\": \"/tmp/video-output/demo-001.mp4\",\n    \"duration_seconds\": 10\n  },\n  \"prompt_used\": \"A cinematic shot of a product reveal...\",\n  \"iterations\": 1,\n  \"nextAction\": { \"type\": \"none\" },\n  \"metadata\": { \"execution_time_ms\": 45000, \"tools_used\": [\"replicate-luma\"] },\n  \"results\": { \"agent_type\": \"video-generation\" }\n}\n\nExample invalid payload (missing required field 'generation_result'):\n{\n  \"agent_id\": \"video-gen-002\",\n  \"agent_type\": \"video-generation\",\n  \"timestamp\": \"2026-02-06T12:00:00.000Z\",\n  \"status\": \"success\"\n}",
+  "allOf": [
+    { "$ref": "../templates/.claude/schemas/agent-output-base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["agent_id", "agent_type", "timestamp", "status", "generation_result"],
+  "properties": {
+    "agent_type": {
+      "type": "string",
+      "description": "Agent category - restricted to surreal-clip-generation",
+      "const": "surreal-clip-generation"
+    },
+    "status": {
+      "type": "string",
+      "description": "Overall execution status of the surreal clip generator agent",
+      "enum": ["success", "blocked", "error"],
+      "default": "success"
+    },
+    "generation_result": {
+      "type": "object",
+      "description": "Video generation job result including provider details and output location",
+      "required": ["job_id", "provider", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "job_id": {
+          "type": "string",
+          "description": "Provider-specific job identifier for tracking and retrieval",
+          "minLength": 1,
+          "examples": ["pred_abc123", "run_xyz789", "job-12345"]
+        },
+        "provider": {
+          "type": "string",
+          "description": "Video generation provider used for this job",
+          "enum": ["replicate-luma", "runway", "kling", "hailuo", "local"],
+          "examples": ["replicate-luma", "runway"]
+        },
+        "status": {
+          "type": "string",
+          "description": "Job status from the video generation provider",
+          "enum": ["pending", "processing", "succeeded", "failed", "timeout"],
+          "examples": ["succeeded", "processing"]
+        },
+        "output_path": {
+          "type": "string",
+          "description": "Local filesystem path to the downloaded video file",
+          "pattern": "^[/\\\\].*\\.(mp4|webm|mov|avi)$",
+          "examples": ["/tmp/video-output/demo-001.mp4", "/home/user/videos/output.webm"]
+        },
+        "duration_seconds": {
+          "type": "number",
+          "description": "Duration of the generated video in seconds",
+          "minimum": 0,
+          "examples": [9, 10, 15]
+        }
+      }
+    },
+    "prompt_used": {
+      "type": "string",
+      "description": "The optimized prompt sent to the video generation provider. May differ from original user input after prompt engineering.",
+      "minLength": 1,
+      "examples": ["A cinematic drone shot of a mountain landscape at sunset, 4K quality, smooth camera movement"]
+    },
+    "provider_selection_rationale": {
+      "type": "string",
+      "description": "Explanation of why this specific provider was selected over alternatives. Useful for debugging and workflow optimization.",
+      "examples": ["Selected replicate-luma for its superior handling of product shots and faster generation time"]
+    },
+    "iterations": {
+      "type": "integer",
+      "description": "Number of generation attempts made before achieving final result. Useful for tracking retry behavior.",
+      "minimum": 1,
+      "default": 1,
+      "examples": [1, 2, 3]
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Surreal clip generation specific metadata including provider timing and quality metrics",
+      "additionalProperties": true,
+      "properties": {
+        "execution_time_ms": {
+          "type": "number",
+          "description": "Total time taken for video generation in milliseconds (includes API calls, polling, download)",
+          "minimum": 0
+        },
+        "tools_used": {
+          "type": "array",
+          "description": "List of MCP tools and services used during execution",
+          "items": {"type": "string"},
+          "examples": [["replicate-luma", "filesystem"]]
+        },
+        "context_sources": {
+          "type": "array",
+          "description": "Context sources consulted for prompt optimization",
+          "items": {"type": "string"}
+        },
+        "provider_response_time_ms": {
+          "type": "number",
+          "description": "Time spent waiting for provider to complete generation (excludes download)",
+          "minimum": 0
+        },
+        "video_resolution": {
+          "type": "string",
+          "description": "Resolution of generated video",
+          "pattern": "^\\d+x\\d+$",
+          "examples": ["1920x1080", "1280x720", "3840x2160"]
+        },
+        "video_fps": {
+          "type": "number",
+          "description": "Frames per second of generated video",
+          "minimum": 1,
+          "examples": [24, 30, 60]
+        },
+        "file_size_bytes": {
+          "type": "integer",
+          "description": "Size of the output video file in bytes",
+          "minimum": 0
+        },
+        "debug_info": {
+          "type": "object",
+          "description": "Additional debug information for troubleshooting",
+          "additionalProperties": true
+        }
+      }
+    },
+    "nextAction": {
+      "type": "object",
+      "description": "Orchestration instructions for workflow chaining. Video generation typically chains to post-processing, review, or completes.",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of next action to perform",
+          "enum": ["none", "spawn_agent", "user_input", "retry", "complete_task"],
+          "examples": ["none", "spawn_agent"]
+        },
+        "agent_type": {
+          "type": "string",
+          "description": "Agent type to spawn when type=spawn_agent",
+          "examples": ["review", "documentation"]
+        },
+        "agent_name": {
+          "type": "string",
+          "description": "Specific agent name to spawn for post-processing workflows",
+          "pattern": "^[a-z0-9-]+$",
+          "examples": ["video-post-processor", "code-reviewer"]
+        },
+        "priority": {
+          "type": "string",
+          "description": "Priority level for the next action",
+          "enum": ["low", "medium", "high", "critical"],
+          "default": "medium"
+        },
+        "payload": {
+          "type": "object",
+          "description": "Data payload for the next action",
+          "additionalProperties": true,
+          "properties": {
+            "runDir": {
+              "type": "string",
+              "description": "Gallery run directory path (e.g., .claude/video/surreal/video-20260209-melting-clocks) where surreal-clip-compositor archives final artifacts"
+            },
+            "video_path": {
+              "type": "string",
+              "description": "Path to generated video for downstream processing"
+            },
+            "task_id": {
+              "type": "string",
+              "description": "Task identifier for task-related actions"
+            },
+            "user_question": {
+              "type": "string",
+              "description": "Question to ask user when type=user_input"
+            },
+            "retry_reason": {
+              "type": "string",
+              "description": "Reason for retry when type=retry"
+            },
+            "context": {
+              "type": "string",
+              "description": "Additional context for the next action"
+            }
+          }
+        }
+      }
+    },
+    "results": {
+      "type": "object",
+      "description": "Surreal clip generation specific results container",
+      "required": ["agent_type"],
+      "properties": {
+        "agent_type": {
+          "type": "string",
+          "const": "surreal-clip-generation",
+          "description": "Must match top-level agent_type for validation"
+        },
+        "video_metadata": {
+          "type": "object",
+          "description": "Detailed metadata about the generated video",
+          "properties": {
+            "codec": {
+              "type": "string",
+              "description": "Video codec used",
+              "examples": ["h264", "h265", "vp9"]
+            },
+            "bitrate_kbps": {
+              "type": "number",
+              "description": "Video bitrate in kilobits per second"
+            },
+            "audio_present": {
+              "type": "boolean",
+              "description": "Whether the video contains an audio track"
+            }
+          }
+        }
+      }
+    },
+    "error": {
+      "type": "object",
+      "description": "Error information when status is 'blocked' or 'error'",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Machine-readable error code for programmatic handling",
+          "pattern": "^[A-Z_]+$",
+          "examples": ["PROVIDER_TIMEOUT", "INVALID_PROMPT", "QUOTA_EXCEEDED", "DOWNLOAD_FAILED"]
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable error message explaining what went wrong",
+          "minLength": 10,
+          "maxLength": 500
+        },
+        "provider_error": {
+          "type": "string",
+          "description": "Raw error message from the video generation provider",
+          "examples": ["Content policy violation detected", "Rate limit exceeded"]
+        },
+        "recoverable": {
+          "type": "boolean",
+          "description": "Whether this error is recoverable without user intervention"
+        },
+        "suggested_action": {
+          "type": "string",
+          "description": "Recommended action to resolve the error",
+          "maxLength": 500,
+          "examples": ["Retry with a different prompt", "Wait 60 seconds and retry"]
+        }
+      },
+      "required": ["code", "message"]
+    }
+  },
+  "examples": [
+    {
+      "agent_id": "video-gen-001",
+      "agent_type": "video-generation",
+      "timestamp": "2026-02-06T12:00:00.000Z",
+      "session_id": "sess_abc123",
+      "schema_version": "1.0.0",
+      "status": "success",
+      "generation_result": {
+        "job_id": "pred_abc123",
+        "provider": "replicate-luma",
+        "status": "succeeded",
+        "output_path": "/tmp/video-output/demo-001.mp4",
+        "duration_seconds": 10
+      },
+      "prompt_used": "A cinematic drone shot of a mountain landscape at sunset, 4K quality, smooth camera movement",
+      "provider_selection_rationale": "Selected replicate-luma for its superior handling of nature shots",
+      "iterations": 1,
+      "nextAction": {
+        "type": "none"
+      },
+      "metadata": {
+        "execution_time_ms": 45000,
+        "tools_used": ["replicate-luma"],
+        "provider_response_time_ms": 42000,
+        "video_resolution": "1920x1080",
+        "video_fps": 24
+      },
+      "results": {
+        "agent_type": "video-generation"
+      }
+    },
+    {
+      "agent_id": "video-gen-002",
+      "agent_type": "video-generation",
+      "timestamp": "2026-02-06T13:00:00.000Z",
+      "session_id": "sess_def456",
+      "schema_version": "1.0.0",
+      "status": "error",
+      "generation_result": {
+        "job_id": "pred_xyz789",
+        "provider": "runway",
+        "status": "failed"
+      },
+      "prompt_used": "Product showcase video for new smartphone",
+      "iterations": 3,
+      "nextAction": {
+        "type": "user_input",
+        "payload": {
+          "user_question": "Video generation failed after 3 attempts. Would you like to try a different provider?"
+        }
+      },
+      "metadata": {
+        "execution_time_ms": 180000,
+        "tools_used": ["runway"]
+      },
+      "results": {
+        "agent_type": "video-generation"
+      },
+      "error": {
+        "code": "PROVIDER_TIMEOUT",
+        "message": "Video generation timed out after 3 attempts with runway provider",
+        "provider_error": "Request timed out after 60000ms",
+        "recoverable": true,
+        "suggested_action": "Try with replicate-luma provider which has better timeout handling"
+      }
+    }
+  ]
+}

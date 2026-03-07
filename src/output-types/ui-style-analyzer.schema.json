@@ -1,0 +1,411 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UIAnalysisReport",
+  "description": "Structured output from the ui-style-analyzer agent",
+  "type": "object",
+  "required": ["metadata", "executiveSummary", "extractedTokens", "recommendations"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "Analysis metadata and context",
+      "required": ["analysisDate", "targetUrl", "pagesAudited"],
+      "properties": {
+        "analysisDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when analysis was performed"
+        },
+        "targetUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Base URL that was analyzed"
+        },
+        "projectDescription": {
+          "type": "string",
+          "description": "Brief description of the product/project"
+        },
+        "targetUsers": {
+          "type": "string",
+          "description": "Description of primary users"
+        },
+        "pagesAudited": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of pages/routes analyzed"
+        },
+        "modalsDiscovered": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of modals/dialogs captured"
+        },
+        "competitorsAnalyzed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of competitor names analyzed"
+        },
+        "screenshotsPath": {
+          "type": "string",
+          "description": "Path to screenshots directory"
+        }
+      }
+    },
+    "executiveSummary": {
+      "type": "object",
+      "description": "High-level analysis summary",
+      "required": ["consistencyScore"],
+      "properties": {
+        "consistencyScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Overall design consistency score (0-100%)"
+        },
+        "criticalIssues": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of P0 critical issues"
+        },
+        "highPriorityIssues": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of P1 high priority issues"
+        },
+        "mediumPriorityIssues": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of P2 medium priority issues"
+        },
+        "lowPriorityIssues": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of P3 low priority issues"
+        },
+        "topRecommendation": {
+          "type": "string",
+          "description": "Single most important recommendation"
+        },
+        "comparisonToIndustry": {
+          "type": "string",
+          "enum": ["below", "at", "above"],
+          "description": "How target compares to industry norms"
+        }
+      }
+    },
+    "routeInventory": {
+      "type": "array",
+      "description": "All discovered routes/pages",
+      "items": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "discoveryMethod": {
+            "type": "string",
+            "enum": ["sitemap", "crawl", "spa-router", "manual"]
+          },
+          "authRequired": { "type": "boolean" },
+          "componentsCount": { "type": "integer", "minimum": 0 },
+          "modalsCount": { "type": "integer", "minimum": 0 },
+          "screenshotPath": { "type": "string" }
+        }
+      }
+    },
+    "modalInventory": {
+      "type": "array",
+      "description": "All discovered modals/dialogs",
+      "items": {
+        "type": "object",
+        "required": ["page", "trigger"],
+        "properties": {
+          "page": { "type": "string" },
+          "trigger": { "type": "string" },
+          "triggerType": {
+            "type": "string",
+            "enum": ["aria-haspopup", "data-attribute", "heuristic"]
+          },
+          "accessible": { "type": "boolean" },
+          "accessibilityIssues": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "screenshotPath": { "type": "string" }
+        }
+      }
+    },
+    "consistencyBreakdown": {
+      "type": "object",
+      "description": "Per-component consistency scores",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "issuesFound": { "type": "integer", "minimum": 0 },
+          "properties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "dominantValue": { "type": "string" },
+                "uniqueValues": { "type": "integer" },
+                "deviationRate": { "type": "number" },
+                "isConsistent": { "type": "boolean" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "tokenViolations": {
+      "type": "array",
+      "description": "Design token compliance violations",
+      "items": {
+        "type": "object",
+        "required": ["value", "component", "property"],
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "The non-compliant value found"
+          },
+          "expectedToken": {
+            "type": "string",
+            "description": "The design token that should be used"
+          },
+          "component": { "type": "string" },
+          "property": { "type": "string" },
+          "occurrences": { "type": "integer", "minimum": 1 },
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low"]
+          }
+        }
+      }
+    },
+    "accessibilityAudit": {
+      "type": "object",
+      "description": "Accessibility scan results",
+      "properties": {
+        "scanPerformed": { "type": "boolean" },
+        "summary": {
+          "type": "object",
+          "properties": {
+            "critical": { "type": "integer", "minimum": 0 },
+            "serious": { "type": "integer", "minimum": 0 },
+            "moderate": { "type": "integer", "minimum": 0 },
+            "minor": { "type": "integer", "minimum": 0 },
+            "passes": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": { "type": "string" },
+              "impact": {
+                "type": "string",
+                "enum": ["critical", "serious", "moderate", "minor"]
+              },
+              "description": { "type": "string" },
+              "help": { "type": "string" },
+              "helpUrl": { "type": "string", "format": "uri" },
+              "occurrences": { "type": "integer", "minimum": 1 }
+            }
+          }
+        },
+        "manualReviewRequired": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Checks that require human evaluation"
+        }
+      }
+    },
+    "heuristicEvaluation": {
+      "type": "array",
+      "description": "Nielsen's 10 Heuristics evaluation",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "score"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "name": { "type": "string" },
+          "score": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4,
+            "description": "0=None, 1=Cosmetic, 2=Minor, 3=Major, 4=Catastrophe"
+          },
+          "findings": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "extractedTokens": {
+      "type": "object",
+      "description": "Design tokens extracted from the UI",
+      "properties": {
+        "colors": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "value": { "type": "string" },
+              "usage": { "type": "string" },
+              "occurrences": { "type": "integer" }
+            }
+          }
+        },
+        "typography": {
+          "type": "object",
+          "properties": {
+            "fontFamilies": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "fontSizes": {
+              "type": "object",
+              "additionalProperties": { "type": "string" }
+            },
+            "fontWeights": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "lineHeights": {
+              "type": "object",
+              "additionalProperties": { "type": "string" }
+            }
+          }
+        },
+        "spacing": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "borderRadius": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "shadows": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "competitiveAnalysis": {
+      "type": "object",
+      "description": "Competitive landscape analysis",
+      "properties": {
+        "competitors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "url": { "type": "string", "format": "uri" },
+              "category": { "type": "string" },
+              "keyPatterns": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "industryPatterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Patterns seen across multiple competitors"
+        },
+        "targetGaps": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Industry-standard patterns missing from target"
+        },
+        "differentiationOpportunities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Areas where ALL competitors have room for improvement"
+        }
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "description": "Prioritized list of recommendations",
+      "items": {
+        "type": "object",
+        "required": ["id", "priority", "title", "problem", "recommendation"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^REC-[0-9]{3}$",
+            "description": "Unique identifier (e.g., REC-001)"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low"]
+          },
+          "title": { "type": "string" },
+          "problem": { "type": "string" },
+          "principleViolated": {
+            "type": "string",
+            "description": "Design principle or heuristic being violated"
+          },
+          "competitiveContext": {
+            "type": "string",
+            "description": "How competitors handle this"
+          },
+          "impact": {
+            "type": "string",
+            "description": "User/business impact"
+          },
+          "recommendation": { "type": "string" },
+          "implementationHint": {
+            "type": "string",
+            "description": "Code direction (marked REQUIRES VALIDATION)"
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          },
+          "affectedPages": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "generatedCode": {
+      "type": "object",
+      "description": "Generated design system code",
+      "properties": {
+        "designTokensW3C": {
+          "type": "object",
+          "description": "W3C Design Tokens Format 2025.10"
+        },
+        "tailwindConfig": {
+          "type": "string",
+          "description": "Tailwind CSS configuration"
+        },
+        "cssVariables": {
+          "type": "string",
+          "description": "CSS custom properties"
+        }
+      }
+    },
+    "positiveObservations": {
+      "type": "array",
+      "description": "Things the UI does well",
+      "items": { "type": "string" }
+    }
+  }
+}

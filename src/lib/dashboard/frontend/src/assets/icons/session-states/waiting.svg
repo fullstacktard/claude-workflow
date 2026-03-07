@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <!-- Raised hand / pause symbol - amber neon -->
+  <g filter="url(#glow)">
+    <!-- Pause bars -->
+    <rect x="18" y="14" width="10" height="36" rx="3" fill="#fbbf24"/>
+    <rect x="36" y="14" width="10" height="36" rx="3" fill="#fbbf24"/>
+  </g>
+</svg>

@@ -1,0 +1,18 @@
+{
+  "mappings": {},
+  "metadata": {
+    "description": "Agent hash to model routing table. Hashes are SHA256[:16] of agent prompts (excluding Notes: section).",
+    "version": "1.0.0",
+    "updated_at": null,
+    "agent_count": 0,
+    "default_model": "opus",
+    "instructions": [
+      "This file maps agent prompt hashes to target model names.",
+      "Regenerate with: claude-workflow generate-agent-hashes",
+      "Or use: claude-workflow generate-agent-hashes",
+      "",
+      "Model names must match entries in litellm_config.yaml model_list"
+    ]
+  },
+  "agent_info": {}
+}

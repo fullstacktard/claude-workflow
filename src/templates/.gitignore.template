@@ -1,0 +1,4 @@
+node_modules/
+
+# Claude workflow (local configuration, hooks, and session data)
+.claude/

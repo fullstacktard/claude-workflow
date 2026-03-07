@@ -1,0 +1,130 @@
+@reference "./globals.css";
+
+@layer components {
+  /* ==========================================================================
+   * DASHBOARD LAYOUT
+   * ========================================================================== */
+
+  /* Dashboard layout - flexbox with row distribution optimized for large screens.
+   * On mobile (<lg): single scrollable column with auto-height widgets.
+   * On desktop (lg+): fixed 50/50 split with overflow hidden. */
+  .dashboard-layout {
+    @apply bg-gray-950 p-2 sm:p-3 flex flex-col gap-2;
+    height: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  @media (min-width: 1024px) {
+    .dashboard-layout {
+      overflow: hidden;
+    }
+  }
+
+  /* Top row - accounts and logs side by side */
+  .dashboard-row--top {
+    min-height: 0;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .dashboard-row--top > * {
+    pointer-events: auto;
+  }
+
+  @media (min-width: 1024px) {
+    .dashboard-row--top {
+      flex: 1 1 0%;
+      max-height: 50%;
+      overflow: hidden;
+    }
+  }
+
+  /* Bottom row - 3-column grid */
+  .dashboard-row--bottom {
+    min-height: 0;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .dashboard-row--bottom > * {
+    pointer-events: auto;
+  }
+
+  @media (min-width: 1024px) {
+    .dashboard-row--bottom {
+      flex: 1 1 0%;
+      max-height: 50%;
+      overflow: hidden;
+    }
+  }
+
+  /* Widget container - auto height on mobile, fill parent on desktop */
+  .dashboard-widget-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    isolation: isolate;
+    position: relative;
+  }
+
+  @media (max-width: 1023px) {
+    .dashboard-widget-container {
+      height: auto;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .dashboard-widget-container {
+      @apply h-full;
+    }
+  }
+
+  /* Loading state */
+  .dashboard-loading {
+    @apply flex items-center justify-center h-full;
+  }
+
+  /* ==========================================================================
+   * ACCOUNT CARDS GRID
+   * ========================================================================== */
+
+  .account-cards-grid {
+    overflow-y: auto;
+  }
+
+  /* ==========================================================================
+   * LOADING SPINNER
+   * ========================================================================== */
+
+  .spinner {
+    @apply animate-spin rounded-full;
+  }
+
+  .spinner.spinner-white {
+    border-color: oklch(1 0 0 / 30%);
+    border-top-color: oklch(1 0 0) !important;
+  }
+
+  /* ==========================================================================
+   * FILTER TOGGLE
+   * ========================================================================== */
+
+  .filter-toggle {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs;
+    @apply bg-gray-800 text-gray-500 border border-gray-700;
+    @apply hover:border-gray-600 hover:text-gray-400 transition-colors;
+  }
+
+  .filter-toggle--active {
+    @apply bg-amber-900/30 text-amber-400 border-amber-700/50;
+    @apply hover:bg-amber-800/30 hover:text-amber-300;
+  }
+
+  .filter-toggle__icon {
+    @apply text-xs;
+  }
+}

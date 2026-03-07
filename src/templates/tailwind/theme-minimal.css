@@ -1,0 +1,159 @@
+/**
+ * Tailwind v4 Minimal @theme Configuration
+ * Essential Design Tokens Only
+ *
+ * A lightweight theme with essential tokens for quick project starts.
+ * Use this template when you want a simple, opinionated set of design tokens
+ * without the full complexity of the complete theme.
+ *
+ * For comprehensive design systems, use theme.css instead.
+ *
+ * COLOR FORMAT: OKLCH (Oklab Lightness Chroma Hue)
+ * - L = Lightness (0-1): 0 is black, 1 is white
+ * - C = Chroma (0-0.4): Color saturation/intensity
+ * - H = Hue (0-360): Color wheel position
+ *
+ * USAGE:
+ *   @import "tailwindcss";
+ *   @import "./theme-minimal.css";
+ *
+ * NOTE: This template EXTENDS Tailwind's defaults rather than replacing them.
+ * The full spacing, color scales, and other utilities remain available.
+ *
+ * @see https://tailwindcss.com/docs/theme
+ */
+
+@theme {
+  /* ============================================
+   * PRIMARY BRAND COLORS
+   * ============================================
+   * Simple three-color primary palette for most use cases.
+   * Adjust the hue (250 = blue) to match your brand.
+   */
+  --color-primary: oklch(0.56 0.18 250);
+  --color-primary-light: oklch(0.76 0.12 250);
+  --color-primary-dark: oklch(0.40 0.14 250);
+
+  /* ============================================
+   * SEMANTIC COLORS
+   * ============================================
+   * Status colors for feedback and UI states.
+   */
+  --color-success: oklch(0.65 0.18 145);   /* Green - Positive actions */
+  --color-warning: oklch(0.75 0.18 85);    /* Amber - Caution, pending */
+  --color-error: oklch(0.60 0.22 25);      /* Red - Errors, destructive */
+  --color-info: oklch(0.65 0.15 230);      /* Cyan - Information, tips */
+
+  /* ============================================
+   * SURFACE COLORS
+   * ============================================
+   * Core colors for backgrounds, text, and UI elements.
+   */
+  --color-background: oklch(1 0 0);            /* Main background */
+  --color-foreground: oklch(0.15 0.01 250);    /* Primary text */
+  --color-muted: oklch(0.55 0.015 250);        /* Secondary text */
+  --color-border: oklch(0.88 0.01 250);        /* Default borders */
+
+  /* Surface variations for cards and elevated content */
+  --color-surface: oklch(0.99 0.002 250);
+  --color-surface-raised: oklch(1 0 0);
+
+  /* ============================================
+   * TYPOGRAPHY
+   * ============================================
+   * Essential font families for UI and code.
+   */
+  --font-family-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  /* ============================================
+   * SPACING SHORTCUTS
+   * ============================================
+   * Named spacing values for common use cases.
+   * Use these for consistent component spacing.
+   *
+   * NOTE: Tailwind's numeric scale (1-96) is still available.
+   * These are semantic aliases for clarity.
+   */
+  --spacing-xs: 0.25rem;    /* 4px - Tight spacing */
+  --spacing-sm: 0.5rem;     /* 8px - Small gaps */
+  --spacing-md: 1rem;       /* 16px - Default padding */
+  --spacing-lg: 1.5rem;     /* 24px - Section spacing */
+  --spacing-xl: 2rem;       /* 32px - Large gaps */
+  --spacing-2xl: 3rem;      /* 48px - Major sections */
+
+  /* ============================================
+   * BORDER RADIUS
+   * ============================================
+   * Common radius values for UI elements.
+   */
+  --radius-sm: 0.25rem;     /* 4px - Buttons, inputs */
+  --radius-md: 0.5rem;      /* 8px - Cards, modals */
+  --radius-lg: 0.75rem;     /* 12px - Large containers */
+  --radius-full: 9999px;    /* Pills, avatars */
+
+  /* ============================================
+   * SHADOWS
+   * ============================================
+   * Essential shadows for depth and elevation.
+   */
+  --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.1), 0 2px 4px -2px oklch(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.1), 0 4px 6px -4px oklch(0 0 0 / 0.1);
+}
+
+/* ============================================
+ * DARK MODE
+ * ============================================
+ * Override colors for dark mode using class strategy.
+ * Add "dark" class to <html> or <body> to activate.
+ */
+.dark {
+  /* Surface colors inverted */
+  --color-background: oklch(0.13 0.01 250);
+  --color-foreground: oklch(0.95 0.005 250);
+  --color-muted: oklch(0.60 0.015 250);
+  --color-border: oklch(0.30 0.015 250);
+
+  --color-surface: oklch(0.18 0.01 250);
+  --color-surface-raised: oklch(0.22 0.012 250);
+
+  /* Semantic colors adjusted for visibility */
+  --color-success: oklch(0.70 0.18 145);
+  --color-warning: oklch(0.78 0.18 85);
+  --color-error: oklch(0.65 0.22 25);
+  --color-info: oklch(0.70 0.15 230);
+
+  /* Shadows need more opacity on dark backgrounds */
+  --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.4), 0 2px 4px -2px oklch(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.4), 0 4px 6px -4px oklch(0 0 0 / 0.4);
+}
+
+/* ============================================
+ * SYSTEM PREFERENCE DARK MODE (Alternative)
+ * ============================================
+ * Uncomment to enable automatic dark mode based on OS preference.
+ */
+/*
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --color-background: oklch(0.13 0.01 250);
+    --color-foreground: oklch(0.95 0.005 250);
+    --color-muted: oklch(0.60 0.015 250);
+    --color-border: oklch(0.30 0.015 250);
+
+    --color-surface: oklch(0.18 0.01 250);
+    --color-surface-raised: oklch(0.22 0.012 250);
+
+    --color-success: oklch(0.70 0.18 145);
+    --color-warning: oklch(0.78 0.18 85);
+    --color-error: oklch(0.65 0.22 25);
+    --color-info: oklch(0.70 0.15 230);
+
+    --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.4), 0 2px 4px -2px oklch(0 0 0 / 0.4);
+    --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.4), 0 4px 6px -4px oklch(0 0 0 / 0.4);
+  }
+}
+*/

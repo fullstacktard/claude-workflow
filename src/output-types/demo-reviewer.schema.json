@@ -1,0 +1,268 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "demo-reviewer-output",
+  "title": "Demo Reviewer Agent Output Schema",
+  "description": "JSON output schema for demo-reviewer agent. Extends agent-output-base.schema.json using allOf composition. Outputs per-scene pass/fail results with fix suggestions for retry loops.",
+  "allOf": [
+    { "$ref": "../templates/.claude/schemas/agent-output-base.schema.json" }
+  ],
+  "type": "object",
+  "properties": {
+    "agent_type": {
+      "type": "string",
+      "description": "Agent category - review for QA/analysis agents",
+      "enum": ["review"]
+    },
+    "status": {
+      "type": "string",
+      "description": "Overall status: success = terminal (pass or max retries), blocked = needs retry",
+      "enum": ["success", "blocked", "error"],
+      "default": "success"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Agent-specific metadata including iteration tracking",
+      "additionalProperties": true,
+      "properties": {
+        "execution_time_ms": {
+          "type": "number",
+          "description": "Time taken for agent execution in milliseconds",
+          "minimum": 0
+        },
+        "tools_used": {
+          "type": "array",
+          "description": "List of tools used during execution",
+          "items": { "type": "string" }
+        },
+        "context_sources": {
+          "type": "array",
+          "description": "List of context sources consulted",
+          "items": { "type": "string" }
+        },
+        "iteration": {
+          "type": "number",
+          "description": "Current QA iteration number (1-indexed)",
+          "minimum": 1
+        }
+      }
+    },
+    "results": {
+      "type": "object",
+      "description": "Video QA analysis results with per-scene breakdown",
+      "required": ["agent_type", "verdict", "total_scenes", "passed_scenes", "failed_scenes", "scene_results", "technical_checks", "retry_recommendation"],
+      "properties": {
+        "agent_type": {
+          "type": "string",
+          "const": "review"
+        },
+        "verdict": {
+          "type": "string",
+          "description": "Overall QA verdict",
+          "enum": ["pass", "fail"]
+        },
+        "total_scenes": {
+          "type": "number",
+          "description": "Total number of scenes expected from spec",
+          "minimum": 1
+        },
+        "passed_scenes": {
+          "type": "number",
+          "description": "Number of scenes that passed all checks",
+          "minimum": 0
+        },
+        "failed_scenes": {
+          "type": "number",
+          "description": "Number of scenes that failed at least one check",
+          "minimum": 0
+        },
+        "scene_results": {
+          "type": "array",
+          "description": "Per-scene QA breakdown",
+          "items": {
+            "$ref": "#/definitions/SceneResult"
+          }
+        },
+        "technical_checks": {
+          "$ref": "#/definitions/TechnicalChecks"
+        },
+        "retry_recommendation": {
+          "$ref": "#/definitions/RetryRecommendation"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "CheckResult": {
+      "type": "string",
+      "enum": ["pass", "minor_issue", "fail", "skip", "n/a"],
+      "description": "Result of a single QA check"
+    },
+    "SceneResult": {
+      "type": "object",
+      "description": "QA result for a single scene",
+      "required": ["scene_index", "scene_name", "tier1_critical", "tier2_important", "tier3_quality", "verdict"],
+      "properties": {
+        "scene_index": {
+          "type": "number",
+          "description": "0-based scene index",
+          "minimum": 0
+        },
+        "scene_name": {
+          "type": "string",
+          "description": "Scene name from the prompt spec"
+        },
+        "tier1_critical": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Tier 1: Scene exists and shows correct content"
+        },
+        "tier2_important": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Tier 2: Actions performed correctly, transitions clean"
+        },
+        "tier3_quality": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Tier 3: Visual polish, cursor smoothness, zoom quality"
+        },
+        "verdict": {
+          "type": "string",
+          "description": "Overall scene verdict",
+          "enum": ["pass", "fail"]
+        },
+        "notes": {
+          "type": "string",
+          "description": "Human-readable explanation of result",
+          "default": ""
+        },
+        "suggested_fix": {
+          "type": "string",
+          "description": "Suggested fix for demo-recorder if scene failed"
+        }
+      }
+    },
+    "TechnicalChecks": {
+      "type": "object",
+      "description": "Cross-cutting technical quality checks",
+      "properties": {
+        "device_frame": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Device frame is correct type and not clipped"
+        },
+        "video_integrity": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "No black frames, freezes, or artifacts"
+        },
+        "cursor_smoothness": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Cursor moves smoothly, no teleporting"
+        },
+        "zoom_quality": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Zoom animations are smooth and correctly targeted"
+        },
+        "visual_polish": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Overall professional appearance"
+        },
+        "pacing": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Video pacing is appropriate"
+        },
+        "captions": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Caption readability and timing (n/a if disabled)"
+        }
+      }
+    },
+    "SuggestedFix": {
+      "type": "object",
+      "description": "Specific fix suggestion for demo-recorder",
+      "required": ["scene_index", "fix_type", "description"],
+      "properties": {
+        "scene_index": {
+          "type": "number",
+          "description": "Which scene this fix applies to",
+          "minimum": 0
+        },
+        "fix_type": {
+          "type": "string",
+          "description": "Category of fix",
+          "enum": [
+            "increase_wait",
+            "change_selector",
+            "add_action",
+            "remove_action",
+            "adjust_zoom",
+            "adjust_cursor",
+            "adjust_caption",
+            "re_analyze_page",
+            "disable_effect",
+            "user_guidance",
+            "adjust_scroll",
+            "adjust_viewport",
+            "skip_scene"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable fix description"
+        },
+        "parameter": {
+          "type": "string",
+          "description": "Parameter name to adjust"
+        },
+        "value": {
+          "description": "New value for the parameter"
+        }
+      }
+    },
+    "RetryRecommendation": {
+      "type": "object",
+      "description": "Recommendation for whether and how to retry video generation",
+      "required": ["should_retry", "failed_scene_indices", "error_signatures"],
+      "properties": {
+        "should_retry": {
+          "type": "boolean",
+          "description": "Whether the video should be re-generated"
+        },
+        "failed_scene_indices": {
+          "type": "array",
+          "description": "0-based indices of scenes that need re-capture",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "suggested_fixes": {
+          "type": "array",
+          "description": "Specific fixes for each failed scene",
+          "items": {
+            "$ref": "#/definitions/SuggestedFix"
+          },
+          "default": []
+        },
+        "error_signatures": {
+          "type": "array",
+          "description": "Error signature strings for convergence tracking. Format: {tier}:{check}:{scene_index}",
+          "items": {
+            "type": "string",
+            "pattern": "^T[123]:[A-Z_]+:\\d+$"
+          }
+        },
+        "non_converging": {
+          "type": "array",
+          "description": "Error signatures that appeared 2+ times across iterations",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "convergence_status": {
+          "type": "string",
+          "description": "Overall convergence assessment",
+          "enum": ["converging", "new_errors", "non_converging", "resolved"],
+          "default": "new_errors"
+        }
+      }
+    }
+  }
+}

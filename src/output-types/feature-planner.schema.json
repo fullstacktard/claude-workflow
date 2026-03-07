@@ -1,0 +1,178 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "feature-planner-output",
+  "title": "Feature Planner Agent Output Schema",
+  "description": "JSON output schema for feature-planner agent. Extends agent-output-base.schema.json using allOf composition.",
+  "allOf": [
+    { "$ref": "../templates/.claude/schemas/agent-output-base.schema.json" }
+  ],
+  "type": "object",
+  "properties": {
+    "agent_type": {
+      "type": "string",
+      "description": "Agent category - restricted to architecture for feature-planner",
+      "enum": ["architecture"]
+    },
+    "status": {
+      "type": "string",
+      "description": "Overall success/failure status of the agent execution",
+      "enum": ["success", "failure", "partial", "blocked", "skipped"],
+      "default": "success"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Agent-specific metadata including workflow tracking for multi-phase orchestration",
+      "additionalProperties": true,
+      "properties": {
+        "execution_time_ms": {
+          "type": "number",
+          "description": "Time taken for agent execution in milliseconds",
+          "minimum": 0
+        },
+        "tools_used": {
+          "type": "array",
+          "description": "List of tools and MCP services used during execution",
+          "items": {"type": "string"}
+        },
+        "context_sources": {
+          "type": "array",
+          "description": "List of context sources consulted (files, documentation, MCP services)",
+          "items": {"type": "string"}
+        },
+        "workflow_id": {
+          "type": "string",
+          "description": "Workflow identifier for tracking multi-phase orchestration. Used to link feature-planner output to spawned task-maker agents and track workflow continuity.",
+          "pattern": "^[a-zA-Z0-9-_]+$",
+          "examples": ["workflow-1705849200000", "feature-auth-001"]
+        },
+        "debug_info": {
+          "type": "object",
+          "description": "Additional debug information for troubleshooting",
+          "additionalProperties": true
+        }
+      }
+    },
+    "nextAction": {
+      "type": "object",
+      "description": "Orchestration instructions for what should happen next",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of next action to perform",
+          "enum": ["spawn_agent", "spawn_multiple", "create_task", "update_task", "complete_task", "none", "user_input", "hook_action", "cli_command"]
+        },
+        "agent_type": {
+          "type": "string",
+          "description": "Agent type to spawn when type=spawn_agent",
+          "enum": ["task-management", "implementation", "review", "documentation", "ui-generation", "architecture", "refactor", "debug", "explore"]
+        },
+        "agent_name": {
+          "type": "string",
+          "description": "Specific agent name to spawn",
+          "examples": ["task-maker", "frontend-engineer", "code-reviewer"]
+        },
+        "priority": {
+          "type": "string",
+          "description": "Priority level for the next action",
+          "enum": ["low", "medium", "high", "critical"],
+          "default": "medium"
+        },
+        "payload": {
+          "type": "object",
+          "description": "Data payload for the next action",
+          "additionalProperties": true,
+          "properties": {
+            "workflow_id": {
+              "type": "string",
+              "description": "Workflow identifier propagated to spawned agents for workflow tracking continuity",
+              "pattern": "^[a-zA-Z0-9-_]+$"
+            },
+            "task_spec": {
+              "type": "object",
+              "description": "Task specification containing feature name and tasks array"
+            }
+          }
+        },
+        "agents": {
+          "type": "array",
+          "description": "Multiple agents to spawn when type=spawn_multiple",
+          "items": {
+            "type": "object",
+            "properties": {
+              "agent_type": { "type": "string" },
+              "agent_name": { "type": "string" },
+              "priority": { "type": "string" },
+              "payload": { "type": "object" }
+            },
+            "required": ["agent_type", "agent_name", "payload"]
+          }
+        },
+        "conditions": {
+          "type": "array",
+          "description": "Conditions that must be met before executing this action",
+          "items": { "type": "object" }
+        }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+    "results": {
+      "type": "object",
+      "description": "Feature planner specific results",
+      "properties": {
+        "agent_type": {
+          "type": "string",
+          "const": "architecture"
+        },
+        "feature_plan": {
+          "type": "object",
+          "description": "Feature planning data for feature-planner agents",
+          "properties": {
+            "feature_name": {
+              "type": "string",
+              "description": "Name of the feature being planned",
+              "minLength": 3,
+              "maxLength": 100
+            },
+            "orchestration": {
+              "type": "object",
+              "description": "Orchestration metadata for automated task workflow",
+              "properties": {
+                "post_creation_review": { "type": "boolean", "default": true },
+                "review_agent": { "type": "string", "default": "task-reviewer" },
+                "review_blocking": { "type": "boolean", "default": true }
+              }
+            },
+            "tasks": {
+              "type": "array",
+              "description": "Array of task specifications for task-maker agents",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "number", "minimum": 1 },
+                  "backlog_task_id": { "type": "number", "minimum": 1 },
+                  "title": { "type": "string", "minLength": 10, "maxLength": 100 },
+                  "type": { "type": "string", "enum": ["frontend", "backend", "devops", "testing", "documentation", "research", "ui-generation"] },
+                  "full_requirements": { "type": "string", "minLength": 200 },
+                  "dependencies": { "type": "array", "items": { "type": "number" }, "default": [] },
+                  "depends_on": { "type": "array", "items": { "type": "string" }, "default": [] },
+                  "requires_review": { "type": "boolean", "default": false }
+                },
+                "required": ["id", "backlog_task_id", "title", "type", "full_requirements"],
+                "additionalProperties": false
+              }
+            },
+            "complexity_score": { "type": "number", "minimum": 0, "maximum": 100 },
+            "planning_approach": { "type": "string", "enum": ["auto", "guided", "risk_driven", "phased", "top_down", "bottom_up", "time_boxed"] },
+            "risk_assessment": { "type": "array", "items": { "type": "object" } },
+            "feature_brief_path": { "type": "string", "pattern": "^backlog/specs/feature-[0-9]+-[a-z0-9-]+\\.md$" },
+            "feature_brief_content": { "type": "string", "minLength": 100 }
+          },
+          "required": ["feature_name", "tasks", "feature_brief_path", "feature_brief_content"]
+        }
+      },
+      "required": ["agent_type", "feature_plan"]
+    }
+  }
+}

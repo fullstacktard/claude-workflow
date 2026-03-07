@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules/**",
+    "dist/**",
+    "coverage/**",
+    "tests/**",
+    "src/tests/**",
+    "src/templates/**",
+    "src/lib/dashboard/frontend/**",
+    "src/lib/commands/proxy.ts",
+    "**/*.template.*",
+    "**/*.test.ts",
+    "**/__tests__/**"
+  ]
+}

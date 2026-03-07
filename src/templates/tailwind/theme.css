@@ -1,0 +1,449 @@
+/**
+ * Tailwind v4 @theme Configuration
+ * Full Design System Template
+ *
+ * This file defines your complete design system tokens using Tailwind's CSS-first approach.
+ * All variables defined in @theme generate corresponding utility classes automatically.
+ *
+ * COLOR FORMAT: OKLCH (Oklab Lightness Chroma Hue)
+ * - L = Lightness (0-1): 0 is black, 1 is white
+ * - C = Chroma (0-0.4): Color saturation/intensity
+ * - H = Hue (0-360): Color wheel position
+ * Benefits: Perceptual uniformity - colors at same lightness appear equally bright
+ *
+ * USAGE:
+ *   @import "tailwindcss";
+ *   @import "./theme.css";
+ *
+ * UTILITY CLASSES GENERATED:
+ *   --color-primary-500 enables: bg-primary-500, text-primary-500, border-primary-500
+ *   --spacing-4 enables: p-4, m-4, gap-4, etc.
+ *   --radius-lg enables: rounded-lg
+ *
+ * @see https://tailwindcss.com/docs/theme
+ */
+
+@theme {
+  /* ============================================
+   * RESET DEFAULTS
+   * ============================================
+   * Disable Tailwind's default theme to use only custom tokens.
+   * Remove these lines if you want to EXTEND defaults instead of replacing them.
+   */
+  --color-*: initial;
+  --spacing-*: initial;
+  --font-size-*: initial;
+  --font-family-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+
+  /* ============================================
+   * COLOR PALETTE
+   * ============================================
+   * Using OKLCH for perceptual uniformity across the color scale.
+   * Each step has consistent perceived brightness difference.
+   *
+   * Scale: 50 (lightest) to 950 (darkest)
+   * Usage: 50-200 for backgrounds, 300-500 for accents, 600-900 for text
+   */
+
+  /* ----- Primary Brand Colors ----- */
+  /* Blue hue (250) - Adjust hue for your brand */
+  --color-primary-50: oklch(0.97 0.02 250);
+  --color-primary-100: oklch(0.93 0.04 250);
+  --color-primary-200: oklch(0.86 0.08 250);
+  --color-primary-300: oklch(0.76 0.12 250);
+  --color-primary-400: oklch(0.66 0.16 250);
+  --color-primary-500: oklch(0.56 0.18 250);
+  --color-primary-600: oklch(0.48 0.16 250);
+  --color-primary-700: oklch(0.40 0.14 250);
+  --color-primary-800: oklch(0.33 0.12 250);
+  --color-primary-900: oklch(0.27 0.10 250);
+  --color-primary-950: oklch(0.20 0.08 250);
+
+  /* ----- Secondary Colors ----- */
+  /* Purple hue (300) - Complementary to primary */
+  --color-secondary-50: oklch(0.97 0.02 300);
+  --color-secondary-100: oklch(0.93 0.04 300);
+  --color-secondary-200: oklch(0.86 0.08 300);
+  --color-secondary-300: oklch(0.76 0.12 300);
+  --color-secondary-400: oklch(0.66 0.16 300);
+  --color-secondary-500: oklch(0.56 0.18 300);
+  --color-secondary-600: oklch(0.48 0.16 300);
+  --color-secondary-700: oklch(0.40 0.14 300);
+  --color-secondary-800: oklch(0.33 0.12 300);
+  --color-secondary-900: oklch(0.27 0.10 300);
+  --color-secondary-950: oklch(0.20 0.08 300);
+
+  /* ----- Semantic Colors ----- */
+  /* Success: Green (145) - Positive actions, confirmations */
+  --color-success-50: oklch(0.97 0.02 145);
+  --color-success-100: oklch(0.93 0.06 145);
+  --color-success-200: oklch(0.86 0.10 145);
+  --color-success-300: oklch(0.76 0.14 145);
+  --color-success-400: oklch(0.70 0.16 145);
+  --color-success-500: oklch(0.65 0.18 145);
+  --color-success-600: oklch(0.55 0.16 145);
+  --color-success-700: oklch(0.45 0.14 145);
+  --color-success-800: oklch(0.38 0.12 145);
+  --color-success-900: oklch(0.30 0.10 145);
+  --color-success-950: oklch(0.22 0.08 145);
+
+  /* Warning: Amber (85) - Caution, pending states */
+  --color-warning-50: oklch(0.98 0.02 85);
+  --color-warning-100: oklch(0.94 0.06 85);
+  --color-warning-200: oklch(0.88 0.12 85);
+  --color-warning-300: oklch(0.82 0.16 85);
+  --color-warning-400: oklch(0.78 0.18 85);
+  --color-warning-500: oklch(0.75 0.18 85);
+  --color-warning-600: oklch(0.65 0.16 85);
+  --color-warning-700: oklch(0.55 0.14 85);
+  --color-warning-800: oklch(0.45 0.12 85);
+  --color-warning-900: oklch(0.38 0.10 85);
+  --color-warning-950: oklch(0.28 0.08 85);
+
+  /* Error: Red (25) - Errors, destructive actions */
+  --color-error-50: oklch(0.97 0.02 25);
+  --color-error-100: oklch(0.93 0.06 25);
+  --color-error-200: oklch(0.86 0.12 25);
+  --color-error-300: oklch(0.76 0.16 25);
+  --color-error-400: oklch(0.68 0.20 25);
+  --color-error-500: oklch(0.60 0.22 25);
+  --color-error-600: oklch(0.52 0.20 25);
+  --color-error-700: oklch(0.44 0.18 25);
+  --color-error-800: oklch(0.36 0.14 25);
+  --color-error-900: oklch(0.30 0.12 25);
+  --color-error-950: oklch(0.22 0.10 25);
+
+  /* Info: Cyan (230) - Informational messages, tips */
+  --color-info-50: oklch(0.97 0.02 230);
+  --color-info-100: oklch(0.93 0.04 230);
+  --color-info-200: oklch(0.86 0.08 230);
+  --color-info-300: oklch(0.76 0.12 230);
+  --color-info-400: oklch(0.70 0.14 230);
+  --color-info-500: oklch(0.65 0.15 230);
+  --color-info-600: oklch(0.55 0.14 230);
+  --color-info-700: oklch(0.45 0.12 230);
+  --color-info-800: oklch(0.38 0.10 230);
+  --color-info-900: oklch(0.30 0.08 230);
+  --color-info-950: oklch(0.22 0.06 230);
+
+  /* ----- Neutral/Gray Scale ----- */
+  /* Slight blue tint (250) for a modern, cohesive feel */
+  --color-gray-50: oklch(0.98 0.005 250);
+  --color-gray-100: oklch(0.95 0.008 250);
+  --color-gray-200: oklch(0.90 0.010 250);
+  --color-gray-300: oklch(0.83 0.012 250);
+  --color-gray-400: oklch(0.70 0.015 250);
+  --color-gray-500: oklch(0.55 0.015 250);
+  --color-gray-600: oklch(0.45 0.015 250);
+  --color-gray-700: oklch(0.37 0.012 250);
+  --color-gray-800: oklch(0.27 0.010 250);
+  --color-gray-900: oklch(0.20 0.008 250);
+  --color-gray-950: oklch(0.13 0.005 250);
+
+  /* ----- Semantic Surface Colors ----- */
+  /* These define the visual hierarchy of your application */
+
+  /* Background: Main app background */
+  --color-background: oklch(1 0 0);
+  /* Foreground: Primary text color */
+  --color-foreground: oklch(0.15 0.01 250);
+
+  /* Surface: Cards, modals, elevated content */
+  --color-surface: oklch(0.99 0.002 250);
+  /* Surface-raised: Higher elevation than surface */
+  --color-surface-raised: oklch(1 0 0);
+  /* Surface-sunken: Inset areas, input backgrounds */
+  --color-surface-sunken: oklch(0.97 0.005 250);
+
+  /* Border: Default borders */
+  --color-border: oklch(0.88 0.01 250);
+  /* Border-subtle: Dividers, secondary borders */
+  --color-border-subtle: oklch(0.92 0.008 250);
+  /* Border-strong: Emphasized borders, focus rings */
+  --color-border-strong: oklch(0.75 0.015 250);
+
+  /* Muted: Secondary text, placeholders */
+  --color-muted: oklch(0.55 0.015 250);
+  /* Muted-foreground: Text on muted backgrounds */
+  --color-muted-foreground: oklch(0.45 0.012 250);
+
+  /* ============================================
+   * SPACING SCALE
+   * ============================================
+   * Base unit: 4px (0.25rem)
+   * Follows Tailwind's default scale for familiarity.
+   *
+   * Usage guidelines:
+   * - 0.5-2: Tight spacing (icon gaps, inline elements)
+   * - 3-4: Standard spacing (button padding, form gaps)
+   * - 5-8: Component spacing (card padding, section gaps)
+   * - 10-16: Layout spacing (page margins, major sections)
+   * - 20+: Large spacing (hero sections, page breaks)
+   */
+  --spacing-0: 0;
+  --spacing-px: 1px;
+  --spacing-0\.5: 0.125rem;   /* 2px */
+  --spacing-1: 0.25rem;       /* 4px */
+  --spacing-1\.5: 0.375rem;   /* 6px */
+  --spacing-2: 0.5rem;        /* 8px */
+  --spacing-2\.5: 0.625rem;   /* 10px */
+  --spacing-3: 0.75rem;       /* 12px */
+  --spacing-3\.5: 0.875rem;   /* 14px */
+  --spacing-4: 1rem;          /* 16px */
+  --spacing-5: 1.25rem;       /* 20px */
+  --spacing-6: 1.5rem;        /* 24px */
+  --spacing-7: 1.75rem;       /* 28px */
+  --spacing-8: 2rem;          /* 32px */
+  --spacing-9: 2.25rem;       /* 36px */
+  --spacing-10: 2.5rem;       /* 40px */
+  --spacing-11: 2.75rem;      /* 44px */
+  --spacing-12: 3rem;         /* 48px */
+  --spacing-14: 3.5rem;       /* 56px */
+  --spacing-16: 4rem;         /* 64px */
+  --spacing-20: 5rem;         /* 80px */
+  --spacing-24: 6rem;         /* 96px */
+  --spacing-28: 7rem;         /* 112px */
+  --spacing-32: 8rem;         /* 128px */
+  --spacing-36: 9rem;         /* 144px */
+  --spacing-40: 10rem;        /* 160px */
+  --spacing-44: 11rem;        /* 176px */
+  --spacing-48: 12rem;        /* 192px */
+  --spacing-52: 13rem;        /* 208px */
+  --spacing-56: 14rem;        /* 224px */
+  --spacing-60: 15rem;        /* 240px */
+  --spacing-64: 16rem;        /* 256px */
+  --spacing-72: 18rem;        /* 288px */
+  --spacing-80: 20rem;        /* 320px */
+  --spacing-96: 24rem;        /* 384px */
+
+  /* ============================================
+   * TYPOGRAPHY
+   * ============================================
+   * Font families, sizes, weights, and line heights.
+   *
+   * Font loading: Ensure fonts are loaded via @font-face or
+   * a service like Google Fonts before this file.
+   */
+
+  /* ----- Font Families ----- */
+  /* Sans: Primary UI font - modern, readable */
+  --font-family-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  /* Serif: Long-form content, editorial */
+  --font-family-serif: "Georgia", "Times New Roman", serif;
+  /* Mono: Code, technical content */
+  --font-family-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  /* ----- Font Sizes ----- */
+  /* Follows a ~1.25 (major third) type scale */
+  --font-size-xs: 0.75rem;     /* 12px - Fine print, badges */
+  --font-size-sm: 0.875rem;    /* 14px - Secondary text, labels */
+  --font-size-base: 1rem;      /* 16px - Body text */
+  --font-size-lg: 1.125rem;    /* 18px - Emphasized text */
+  --font-size-xl: 1.25rem;     /* 20px - Subheadings */
+  --font-size-2xl: 1.5rem;     /* 24px - Section headings */
+  --font-size-3xl: 1.875rem;   /* 30px - Page headings */
+  --font-size-4xl: 2.25rem;    /* 36px - Hero text */
+  --font-size-5xl: 3rem;       /* 48px - Display text */
+  --font-size-6xl: 3.75rem;    /* 60px - Large display */
+  --font-size-7xl: 4.5rem;     /* 72px - Extra large display */
+  --font-size-8xl: 6rem;       /* 96px - Massive display */
+  --font-size-9xl: 8rem;       /* 128px - Billboard size */
+
+  /* ----- Font Weights ----- */
+  --font-weight-thin: 100;
+  --font-weight-extralight: 200;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  /* ----- Line Heights ----- */
+  --line-height-none: 1;        /* Headings, single-line text */
+  --line-height-tight: 1.25;    /* Compact headings */
+  --line-height-snug: 1.375;    /* Slightly compact */
+  --line-height-normal: 1.5;    /* Body text (default) */
+  --line-height-relaxed: 1.625; /* Comfortable reading */
+  --line-height-loose: 2;       /* Extra spacious */
+
+  /* ----- Letter Spacing ----- */
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+
+  /* ============================================
+   * BORDER RADIUS
+   * ============================================
+   * Defines the roundness of UI elements.
+   *
+   * Usage:
+   * - sm/DEFAULT: Buttons, inputs
+   * - md/lg: Cards, modals
+   * - xl/2xl/3xl: Large containers, images
+   * - full: Pills, avatars, circular elements
+   */
+  --radius-none: 0;
+  --radius-sm: 0.125rem;       /* 2px */
+  --radius-DEFAULT: 0.25rem;   /* 4px */
+  --radius-md: 0.375rem;       /* 6px */
+  --radius-lg: 0.5rem;         /* 8px */
+  --radius-xl: 0.75rem;        /* 12px */
+  --radius-2xl: 1rem;          /* 16px */
+  --radius-3xl: 1.5rem;        /* 24px */
+  --radius-full: 9999px;       /* Fully rounded */
+
+  /* ============================================
+   * SHADOWS
+   * ============================================
+   * Box shadows for depth and elevation.
+   * Uses OKLCH for consistent shadow colors.
+   *
+   * Elevation hierarchy:
+   * - sm: Subtle lift (buttons, cards at rest)
+   * - DEFAULT: Standard elevation (dropdowns, popovers)
+   * - md: Medium elevation (modals, dialogs)
+   * - lg: High elevation (sticky headers)
+   * - xl/2xl: Dramatic elevation (overlays, drawers)
+   */
+  --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.05);
+  --shadow-DEFAULT: 0 1px 3px 0 oklch(0 0 0 / 0.1), 0 1px 2px -1px oklch(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.1), 0 2px 4px -2px oklch(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.1), 0 4px 6px -4px oklch(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px oklch(0 0 0 / 0.1), 0 8px 10px -6px oklch(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px oklch(0 0 0 / 0.25);
+  --shadow-inner: inset 0 2px 4px 0 oklch(0 0 0 / 0.05);
+  --shadow-none: 0 0 #0000;
+
+  /* ============================================
+   * ANIMATION & EASING
+   * ============================================
+   * Timing functions for smooth, natural animations.
+   *
+   * Guidelines:
+   * - Use ease-out for elements entering (feel responsive)
+   * - Use ease-in for elements leaving (feel natural)
+   * - Use ease-in-out for state changes
+   * - Use ease-fluid/snappy for modern UI feel
+   */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ----- Animation Durations ----- */
+  --duration-75: 75ms;
+  --duration-100: 100ms;
+  --duration-150: 150ms;
+  --duration-200: 200ms;
+  --duration-300: 300ms;
+  --duration-500: 500ms;
+  --duration-700: 700ms;
+  --duration-1000: 1000ms;
+
+  /* ============================================
+   * Z-INDEX SCALE
+   * ============================================
+   * Layering system for overlapping elements.
+   */
+  --z-0: 0;
+  --z-10: 10;
+  --z-20: 20;
+  --z-30: 30;
+  --z-40: 40;
+  --z-50: 50;
+}
+
+/* ============================================
+ * DARK MODE
+ * ============================================
+ * Override theme variables for dark mode.
+ * Uses class strategy (.dark) for manual toggle support.
+ *
+ * To use:
+ * 1. Add "dark" class to <html> or <body> element
+ * 2. Toggle class with JavaScript for user preference
+ *
+ * For automatic system preference, see @media query below.
+ */
+.dark {
+  /* ----- Semantic Surface Colors (Inverted) ----- */
+  --color-background: oklch(0.13 0.01 250);
+  --color-foreground: oklch(0.95 0.005 250);
+
+  --color-surface: oklch(0.18 0.01 250);
+  --color-surface-raised: oklch(0.22 0.012 250);
+  --color-surface-sunken: oklch(0.10 0.008 250);
+
+  --color-border: oklch(0.30 0.015 250);
+  --color-border-subtle: oklch(0.25 0.012 250);
+  --color-border-strong: oklch(0.40 0.018 250);
+
+  --color-muted: oklch(0.60 0.015 250);
+  --color-muted-foreground: oklch(0.70 0.012 250);
+
+  /* ----- Semantic Colors (Adjusted for Dark Background) ----- */
+  /* Slightly brighter to maintain visibility on dark backgrounds */
+  --color-success-500: oklch(0.70 0.18 145);
+  --color-warning-500: oklch(0.78 0.18 85);
+  --color-error-500: oklch(0.65 0.22 25);
+  --color-info-500: oklch(0.70 0.15 230);
+
+  /* ----- Shadows (Darker for Dark Mode) ----- */
+  /* Shadows need more opacity to be visible on dark backgrounds */
+  --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.3);
+  --shadow-DEFAULT: 0 1px 3px 0 oklch(0 0 0 / 0.4), 0 1px 2px -1px oklch(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.4), 0 2px 4px -2px oklch(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.4), 0 4px 6px -4px oklch(0 0 0 / 0.4);
+  --shadow-xl: 0 20px 25px -5px oklch(0 0 0 / 0.4), 0 8px 10px -6px oklch(0 0 0 / 0.4);
+  --shadow-2xl: 0 25px 50px -12px oklch(0 0 0 / 0.5);
+  --shadow-inner: inset 0 2px 4px 0 oklch(0 0 0 / 0.2);
+}
+
+/* ============================================
+ * SYSTEM PREFERENCE DARK MODE (Alternative)
+ * ============================================
+ * Uncomment to enable automatic dark mode based on OS preference.
+ * Uses :root:not(.light) to allow opting out with a "light" class.
+ */
+/*
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --color-background: oklch(0.13 0.01 250);
+    --color-foreground: oklch(0.95 0.005 250);
+
+    --color-surface: oklch(0.18 0.01 250);
+    --color-surface-raised: oklch(0.22 0.012 250);
+    --color-surface-sunken: oklch(0.10 0.008 250);
+
+    --color-border: oklch(0.30 0.015 250);
+    --color-border-subtle: oklch(0.25 0.012 250);
+    --color-border-strong: oklch(0.40 0.018 250);
+
+    --color-muted: oklch(0.60 0.015 250);
+    --color-muted-foreground: oklch(0.70 0.012 250);
+
+    --color-success-500: oklch(0.70 0.18 145);
+    --color-warning-500: oklch(0.78 0.18 85);
+    --color-error-500: oklch(0.65 0.22 25);
+    --color-info-500: oklch(0.70 0.15 230);
+
+    --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.3);
+    --shadow-DEFAULT: 0 1px 3px 0 oklch(0 0 0 / 0.4), 0 1px 2px -1px oklch(0 0 0 / 0.4);
+    --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.4), 0 2px 4px -2px oklch(0 0 0 / 0.4);
+    --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.4), 0 4px 6px -4px oklch(0 0 0 / 0.4);
+    --shadow-xl: 0 20px 25px -5px oklch(0 0 0 / 0.4), 0 8px 10px -6px oklch(0 0 0 / 0.4);
+    --shadow-2xl: 0 25px 50px -12px oklch(0 0 0 / 0.5);
+    --shadow-inner: inset 0 2px 4px 0 oklch(0 0 0 / 0.2);
+  }
+}
+*/

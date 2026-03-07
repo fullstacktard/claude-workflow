@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+
+# Ensure we're in the repo root
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+# CSS Enforcement Philosophy:
+#
+# We enforce 6 STRICT rules:
+#   1. No duplicate class NAMES across files (check-css-duplicates.sh)
+#   2. No Tailwind/utility classes (check-styles.sh)
+#   3. Single class per element (check-single-class.sh)
+#   4. Semantic naming only (check-styles.sh)
+#   5. No hardcoded CSS values (check-hardcoded-values.sh)
+#   6. No size indicators in class names (check-size-indicators.sh)
+#
+# We DON'T check for:
+#   - CSS content duplication - Different semantic classes can share base styles
+#   - CSS file ownership - Component-specific text combos are allowed in component CSS
+#   - Only duplicate class NAMES (not content) are problematic
+
+echo "🔍 Running pre-commit checks sequentially (no parallel execution)..."
+echo ""
+
+ERRORS=0
+
+# List of TypeScript projects to check
+PROJECTS="admin-panel/api admin-panel/webapp alpha-wallet-indexing copy-trading-engine hyperliquid-transaction-indexer parsed-transaction-streamer parsed-transaction-streamer-hyperliquid solana-transaction-indexer wallet-stats-api packages/shared"
+
+echo "📘 TypeScript type checking..."
+echo ""
+
+# Check root TypeScript
+echo "  → Root project..."
+if ! npx tsc --noEmit 2>&1; then
+  echo "    ❌ Root TypeScript errors found"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Check each workspace project sequentially
+for project in $PROJECTS; do
+  if [ -d "$project" ] && [ -f "$project/tsconfig.json" ]; then
+    echo "  → $project..."
+    cd "$project" || exit 1
+    if grep -q "\"type-check\"" package.json 2>/dev/null; then
+      if ! npm run type-check 2>&1; then
+        echo "    ❌ TypeScript errors in $project"
+        ERRORS=$((ERRORS + 1))
+      fi
+    else
+      if ! npx tsc --noEmit 2>&1; then
+        echo "    ❌ TypeScript errors in $project"
+        ERRORS=$((ERRORS + 1))
+      fi
+    fi
+    cd - > /dev/null || exit 1
+  fi
+done
+
+echo ""
+echo "📋 Running ESLint and style checks..."
+echo ""
+
+# ESLint
+echo "  → ESLint (admin-panel/webapp)..."
+cd admin-panel/webapp || exit 1
+if ! npm run lint 2>&1; then
+  echo "    ❌ ESLint errors in webapp"
+  ERRORS=$((ERRORS + 1))
+fi
+cd - > /dev/null || exit 1
+
+# Style checks
+echo "  → Style enforcement..."
+if ! npm run check:styles 2>&1; then
+  echo "    ❌ Style violations found"
+  ERRORS=$((ERRORS + 1))
+fi
+
+echo "  → CSS duplicate classes..."
+if ! bash scripts/check-css-duplicates.sh 2>&1; then
+  echo "    ❌ Duplicate CSS classes found"
+  ERRORS=$((ERRORS + 1))
+fi
+
+echo "  → Single class enforcement..."
+if ! bash scripts/check-single-class.sh 2>&1; then
+  echo "    ❌ Multiple class violations found"
+  ERRORS=$((ERRORS + 1))
+fi
+
+echo "  → Hardcoded CSS values..."
+if ! bash scripts/check-hardcoded-values.sh 2>&1; then
+  echo "    ❌ Hardcoded CSS values found"
+  ERRORS=$((ERRORS + 1))
+fi
+
+echo "  → Size indicators in class names..."
+if ! bash scripts/check-size-indicators.sh 2>&1; then
+  echo "    ❌ Size indicators in class names found"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# echo ""
+# echo "🔨 Building webapp..."
+# echo ""
+# echo "  → Build (admin-panel/webapp)..."
+# cd admin-panel/webapp || exit 1
+# if ! npm run build > /dev/null 2>&1; then
+#   echo "    ❌ Webapp build failed"
+#   ERRORS=$((ERRORS + 1))
+# fi
+# cd - > /dev/null || exit 1
+
+echo ""
+echo "========================================="
+if [ $ERRORS -gt 0 ]; then
+  echo "❌ Pre-commit checks failed with $ERRORS error(s)"
+  echo ""
+  echo "💡 Quick fix:"
+  echo "   npm run precommit        # Auto-fix and verify"
+  echo "   # OR manually:"
+  echo "   npm run webapp:fix       # Fix webapp"
+  echo "   npm run lint:fix         # Fix root lint"
+  echo ""
+  exit 1
+else
+  echo "✅ All pre-commit checks passed!"
+  echo "   - TypeScript: 10 projects + root ✓"
+  echo "   - ESLint: webapp ✓"
+  echo "   - Styles: webapp ✓"
+  echo "   - CSS duplicates: webapp ✓"
+  echo "   - Single class enforcement: webapp ✓"
+  echo "   - Hardcoded CSS values: webapp ✓"
+  echo "   - Size indicators: webapp ✓"
+  echo ""
+fi

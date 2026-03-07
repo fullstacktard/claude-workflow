@@ -1,0 +1,602 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "surreal-video-reviewer-output",
+  "title": "Surreal Video Reviewer Agent Output Schema",
+  "description": "JSON output schema for surreal-video-reviewer agent. Extends agent-output-base.schema.json using allOf composition. Outputs per-clip QA analysis with technical, visual, branding, and creative checks plus retry recommendations.\n\nExample valid payload:\n{\n  \"agent_id\": \"surreal-reviewer-001\",\n  \"agent_type\": \"surreal-video-review\",\n  \"timestamp\": \"2026-02-09T12:00:00.000Z\",\n  \"session_id\": \"sess_abc\",\n  \"schema_version\": \"1.0.0\",\n  \"status\": \"success\",\n  \"results\": {\n    \"agent_type\": \"surreal-video-review\",\n    \"verdict\": \"pass\",\n    \"total_clips\": 2,\n    \"passed_clips\": 2,\n    \"failed_clips\": 0,\n    \"clip_results\": [],\n    \"technical_checks\": { \"overall\": \"pass\" },\n    \"branding_checks\": { \"overall\": \"pass\" },\n    \"creative_checks\": { \"overall\": \"pass\" },\n    \"retry_recommendation\": { \"should_retry\": false, \"retry_target\": \"none\", \"failed_clip_indices\": [], \"error_signatures\": [] }\n  }\n}",
+  "allOf": [
+    { "$ref": "../templates/.claude/schemas/agent-output-base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["agent_id", "agent_type", "timestamp", "status"],
+  "properties": {
+    "agent_type": {
+      "type": "string",
+      "description": "Agent category - surreal-video-review for surreal video QA agents",
+      "const": "surreal-video-review"
+    },
+    "status": {
+      "type": "string",
+      "description": "Overall status: success = terminal (pass or user override), blocked = needs retry",
+      "enum": ["success", "blocked", "error"],
+      "default": "success"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Agent-specific metadata including iteration tracking",
+      "additionalProperties": true,
+      "properties": {
+        "execution_time_ms": {
+          "type": "number",
+          "description": "Time taken for agent execution in milliseconds",
+          "minimum": 0
+        },
+        "tools_used": {
+          "type": "array",
+          "description": "List of tools used during execution",
+          "items": { "type": "string" }
+        },
+        "context_sources": {
+          "type": "array",
+          "description": "List of context sources consulted (runDir, clip paths)",
+          "items": { "type": "string" }
+        },
+        "iteration": {
+          "type": "number",
+          "description": "Current QA iteration number (1-indexed)",
+          "minimum": 1
+        }
+      }
+    },
+    "results": {
+      "type": "object",
+      "description": "Surreal video QA analysis results with per-clip breakdown",
+      "required": [
+        "agent_type", "verdict", "total_clips", "passed_clips",
+        "failed_clips", "clip_results", "technical_checks",
+        "branding_checks", "creative_checks", "retry_recommendation"
+      ],
+      "properties": {
+        "agent_type": {
+          "type": "string",
+          "const": "surreal-video-review"
+        },
+        "verdict": {
+          "type": "string",
+          "description": "Overall QA verdict",
+          "enum": ["pass", "fail"]
+        },
+        "total_clips": {
+          "type": "number",
+          "description": "Total number of clips in the branded video",
+          "minimum": 1
+        },
+        "passed_clips": {
+          "type": "number",
+          "description": "Number of clips that passed all checks",
+          "minimum": 0
+        },
+        "failed_clips": {
+          "type": "number",
+          "description": "Number of clips that failed at least one check",
+          "minimum": 0
+        },
+        "clip_results": {
+          "type": "array",
+          "description": "Per-clip QA breakdown",
+          "items": {
+            "$ref": "#/definitions/ClipResult"
+          }
+        },
+        "technical_checks": {
+          "$ref": "#/definitions/TechnicalChecks"
+        },
+        "branding_checks": {
+          "$ref": "#/definitions/BrandingChecks"
+        },
+        "creative_checks": {
+          "$ref": "#/definitions/CreativeChecks"
+        },
+        "retry_recommendation": {
+          "$ref": "#/definitions/RetryRecommendation"
+        }
+      }
+    },
+    "nextAction": {
+      "type": "object",
+      "description": "Orchestration instructions for workflow chaining",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["none", "spawn_agent", "user_input", "retry", "complete_task"]
+        },
+        "agent_type": {
+          "type": "string",
+          "description": "Agent type to spawn when type=spawn_agent"
+        },
+        "agent_name": {
+          "type": "string",
+          "description": "Specific agent name to spawn",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"],
+          "default": "medium"
+        },
+        "payload": {
+          "type": "object",
+          "description": "Data payload for the next action",
+          "additionalProperties": true,
+          "properties": {
+            "runDir": {
+              "type": "string",
+              "description": "Gallery run directory path"
+            },
+            "retry_target": {
+              "type": "string",
+              "description": "Which phase to retry: clip_generation or clip_composition",
+              "enum": ["clip_generation", "clip_composition"]
+            },
+            "failed_clip_indices": {
+              "type": "array",
+              "description": "Indices of clips that need re-generation",
+              "items": { "type": "number" }
+            },
+            "user_question": {
+              "type": "string"
+            },
+            "context": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "error": {
+      "type": "object",
+      "description": "Error information when status is 'blocked' or 'error'",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Machine-readable error code",
+          "pattern": "^[A-Z_]+$",
+          "examples": ["TECHNICAL_FAILURE", "AI_ARTIFACTS", "BRANDING_ISSUE", "CREATIVE_MISMATCH"]
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable error message",
+          "minLength": 10,
+          "maxLength": 500
+        },
+        "recoverable": {
+          "type": "boolean",
+          "description": "Whether this error is recoverable via retry"
+        },
+        "suggested_action": {
+          "type": "string",
+          "description": "Recommended action to resolve the error",
+          "maxLength": 500
+        }
+      },
+      "required": ["code", "message"]
+    }
+  },
+  "definitions": {
+    "CheckResult": {
+      "type": "string",
+      "enum": ["pass", "minor_issue", "fail", "skip", "n/a"],
+      "description": "Result of a single QA check"
+    },
+    "ClipResult": {
+      "type": "object",
+      "description": "QA result for a single AI-generated clip within the branded video",
+      "required": ["clip_index", "clip_label", "ai_artifacts", "visual_coherence", "concept_match", "motion_quality", "verdict"],
+      "properties": {
+        "clip_index": {
+          "type": "number",
+          "description": "0-based clip index in the video",
+          "minimum": 0
+        },
+        "clip_label": {
+          "type": "string",
+          "description": "Clip label from the generation phase"
+        },
+        "ai_artifacts": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Unintentional AI generation artifacts (flickering, deformation, temporal glitches)"
+        },
+        "visual_coherence": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Internal visual consistency within the clip"
+        },
+        "concept_match": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Does clip content match its concept/label?"
+        },
+        "motion_quality": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Smoothness and intentionality of motion"
+        },
+        "verdict": {
+          "type": "string",
+          "description": "Overall clip verdict",
+          "enum": ["pass", "fail"]
+        },
+        "severity": {
+          "type": "string",
+          "description": "Issue severity level",
+          "enum": ["critical", "major", "minor", "pass"],
+          "default": "pass"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Human-readable explanation of result",
+          "default": ""
+        },
+        "suggested_fix": {
+          "type": "string",
+          "description": "Suggested fix if clip failed"
+        }
+      }
+    },
+    "TechnicalChecks": {
+      "type": "object",
+      "description": "Technical quality checks from ffprobe",
+      "properties": {
+        "resolution": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Video resolution matches expected (default 1920x1080)"
+        },
+        "codec": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Video codec is h264"
+        },
+        "framerate": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Framerate is >= 24fps"
+        },
+        "duration": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Duration matches expected (sum of clips minus transition overlaps)"
+        },
+        "file_integrity": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "File is not empty or corrupt"
+        },
+        "audio_stream": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Audio stream present if background audio was requested"
+        },
+        "overall": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Overall technical quality verdict"
+        }
+      }
+    },
+    "BrandingChecks": {
+      "type": "object",
+      "description": "Branding element checks from Gemini analysis",
+      "properties": {
+        "logo": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Logo is visible and correctly positioned"
+        },
+        "text_overlays": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Text overlays are readable and properly positioned"
+        },
+        "transitions": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Transitions between clips are smooth and correct type"
+        },
+        "audio": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Background audio is present and at appropriate volume"
+        },
+        "overall": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Overall branding quality verdict"
+        }
+      }
+    },
+    "CreativeChecks": {
+      "type": "object",
+      "description": "Creative brief compliance checks",
+      "properties": {
+        "mood_match": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Video evokes the mood specified in the creative brief"
+        },
+        "style_match": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Visual style matches the style reference"
+        },
+        "surreal_quality": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Video achieves surreal/dreamlike aesthetic"
+        },
+        "overall": {
+          "$ref": "#/definitions/CheckResult",
+          "description": "Overall creative quality verdict"
+        }
+      }
+    },
+    "SuggestedFix": {
+      "type": "object",
+      "description": "Specific fix suggestion for retry",
+      "required": ["clip_index", "fix_type", "description", "target_phase"],
+      "properties": {
+        "clip_index": {
+          "type": "number",
+          "description": "Which clip this fix applies to (-1 for global fixes)",
+          "minimum": -1
+        },
+        "fix_type": {
+          "type": "string",
+          "description": "Category of fix",
+          "enum": [
+            "regenerate_clip",
+            "switch_provider",
+            "simplify_prompt",
+            "recompose",
+            "fix_logo",
+            "fix_text",
+            "fix_transition",
+            "fix_audio",
+            "user_guidance"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable fix description"
+        },
+        "target_phase": {
+          "type": "string",
+          "description": "Which workflow phase should handle this fix",
+          "enum": ["clip_generation", "clip_composition"]
+        },
+        "parameter": {
+          "type": "string",
+          "description": "Parameter name to adjust"
+        },
+        "value": {
+          "description": "New value for the parameter"
+        }
+      }
+    },
+    "RetryRecommendation": {
+      "type": "object",
+      "description": "Recommendation for whether and how to retry",
+      "required": ["should_retry", "retry_target", "failed_clip_indices", "error_signatures"],
+      "properties": {
+        "should_retry": {
+          "type": "boolean",
+          "description": "Whether the video should be re-generated or re-composed"
+        },
+        "retry_target": {
+          "type": "string",
+          "description": "Which phase to retry",
+          "enum": ["clip_generation", "clip_composition", "none"]
+        },
+        "failed_clip_indices": {
+          "type": "array",
+          "description": "0-based indices of clips that need re-generation",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "suggested_fixes": {
+          "type": "array",
+          "description": "Specific fixes for each failed item",
+          "items": {
+            "$ref": "#/definitions/SuggestedFix"
+          },
+          "default": []
+        },
+        "error_signatures": {
+          "type": "array",
+          "description": "Error signature strings for convergence tracking. Format: {tier}:{check}:{clip_index}",
+          "items": {
+            "type": "string",
+            "pattern": "^T[012]:[A-Z_]+:\\d+$"
+          }
+        },
+        "non_converging": {
+          "type": "array",
+          "description": "Error signatures that appeared 2+ times across iterations",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "convergence_status": {
+          "type": "string",
+          "description": "Overall convergence assessment",
+          "enum": ["converging", "new_errors", "non_converging", "resolved"],
+          "default": "new_errors"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "agent_id": "surreal-reviewer-001",
+      "agent_type": "surreal-video-review",
+      "timestamp": "2026-02-09T12:00:00.000Z",
+      "session_id": "sess_abc123",
+      "schema_version": "1.0.0",
+      "status": "success",
+      "nextAction": { "type": "none" },
+      "metadata": {
+        "execution_time_ms": 35000,
+        "tools_used": ["analyze_video_gemini", "ffprobe"],
+        "iteration": 1
+      },
+      "results": {
+        "agent_type": "surreal-video-review",
+        "verdict": "pass",
+        "total_clips": 2,
+        "passed_clips": 2,
+        "failed_clips": 0,
+        "clip_results": [
+          {
+            "clip_index": 0,
+            "clip_label": "melting-clock",
+            "ai_artifacts": "pass",
+            "visual_coherence": "pass",
+            "concept_match": "pass",
+            "motion_quality": "pass",
+            "verdict": "pass",
+            "severity": "pass",
+            "notes": ""
+          },
+          {
+            "clip_index": 1,
+            "clip_label": "liquid-time",
+            "ai_artifacts": "pass",
+            "visual_coherence": "pass",
+            "concept_match": "pass",
+            "motion_quality": "minor_issue",
+            "verdict": "pass",
+            "severity": "minor",
+            "notes": "Slight jitter at 3s mark, acceptable for surreal content"
+          }
+        ],
+        "technical_checks": {
+          "resolution": "pass",
+          "codec": "pass",
+          "framerate": "pass",
+          "duration": "pass",
+          "file_integrity": "pass",
+          "audio_stream": "pass",
+          "overall": "pass"
+        },
+        "branding_checks": {
+          "logo": "pass",
+          "text_overlays": "pass",
+          "transitions": "pass",
+          "audio": "pass",
+          "overall": "pass"
+        },
+        "creative_checks": {
+          "mood_match": "pass",
+          "style_match": "pass",
+          "surreal_quality": "pass",
+          "overall": "pass"
+        },
+        "retry_recommendation": {
+          "should_retry": false,
+          "retry_target": "none",
+          "failed_clip_indices": [],
+          "suggested_fixes": [],
+          "error_signatures": [],
+          "non_converging": [],
+          "convergence_status": "resolved"
+        }
+      }
+    },
+    {
+      "agent_id": "surreal-reviewer-002",
+      "agent_type": "surreal-video-review",
+      "timestamp": "2026-02-09T13:00:00.000Z",
+      "session_id": "sess_def456",
+      "schema_version": "1.0.0",
+      "status": "blocked",
+      "nextAction": {
+        "type": "spawn_agent",
+        "agent_name": "surreal-clip-generator",
+        "payload": {
+          "retry_target": "clip_generation",
+          "failed_clip_indices": [1]
+        }
+      },
+      "metadata": {
+        "execution_time_ms": 40000,
+        "tools_used": ["analyze_video_gemini", "ffprobe"],
+        "iteration": 1
+      },
+      "results": {
+        "agent_type": "surreal-video-review",
+        "verdict": "fail",
+        "total_clips": 2,
+        "passed_clips": 1,
+        "failed_clips": 1,
+        "clip_results": [
+          {
+            "clip_index": 0,
+            "clip_label": "melting-clock",
+            "ai_artifacts": "pass",
+            "visual_coherence": "pass",
+            "concept_match": "pass",
+            "motion_quality": "pass",
+            "verdict": "pass",
+            "severity": "pass",
+            "notes": ""
+          },
+          {
+            "clip_index": 1,
+            "clip_label": "liquid-time",
+            "ai_artifacts": "fail",
+            "visual_coherence": "fail",
+            "concept_match": "pass",
+            "motion_quality": "fail",
+            "verdict": "fail",
+            "severity": "critical",
+            "notes": "Heavy flickering throughout clip, faces with wrong finger count visible, temporal glitching at 2-4s",
+            "suggested_fix": "Regenerate with simpler prompt or switch to kling provider"
+          }
+        ],
+        "technical_checks": {
+          "resolution": "pass",
+          "codec": "pass",
+          "framerate": "pass",
+          "duration": "pass",
+          "file_integrity": "pass",
+          "audio_stream": "pass",
+          "overall": "pass"
+        },
+        "branding_checks": {
+          "logo": "pass",
+          "text_overlays": "pass",
+          "transitions": "pass",
+          "audio": "pass",
+          "overall": "pass"
+        },
+        "creative_checks": {
+          "mood_match": "pass",
+          "style_match": "minor_issue",
+          "surreal_quality": "pass",
+          "overall": "minor_issue"
+        },
+        "retry_recommendation": {
+          "should_retry": true,
+          "retry_target": "clip_generation",
+          "failed_clip_indices": [1],
+          "suggested_fixes": [
+            {
+              "clip_index": 1,
+              "fix_type": "regenerate_clip",
+              "description": "Regenerate clip 2 with simplified prompt removing human elements",
+              "target_phase": "clip_generation",
+              "parameter": "prompt",
+              "value": "Abstract liquid time flowing like water through surreal landscape, no human figures"
+            }
+          ],
+          "error_signatures": ["T1:AI_ARTIFACT:1", "T1:VISUAL_INCOHERENCE:1", "T1:MOTION_JITTER:1"],
+          "non_converging": [],
+          "convergence_status": "new_errors"
+        }
+      },
+      "error": {
+        "code": "AI_ARTIFACTS",
+        "message": "Clip 2 (liquid-time) has critical AI generation artifacts: flickering, deformed hands, temporal glitching",
+        "recoverable": true,
+        "suggested_action": "Regenerate clip with simplified prompt or switch to kling provider"
+      }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc",
+  "_readme": [
+    "=============================================================================",
+    "ESLint Configuration for Tailwind CSS v4 (Legacy Format)",
+    "=============================================================================",
+    "",
+    "This configuration enforces design token usage and Tailwind best practices.",
+    "Use this for projects with ESLint < v9. For ESLint 9+, use the flat config",
+    "(tailwind.eslint.config.mjs) instead.",
+    "",
+    "Key Rules:",
+    "- no-arbitrary-value: ERROR - Forces use of @theme design tokens",
+    "- no-contradicting-classname: ERROR - Prevents conflicting classes",
+    "- enforces-shorthand: WARN - Suggests shorthand usage",
+    "- classnames-order: WARN - Consistent class ordering",
+    "",
+    "Installation:",
+    "  npm install -D eslint-plugin-tailwindcss@beta  # For Tailwind v4",
+    "  npm install -D eslint-plugin-tailwindcss       # For Tailwind v3",
+    "",
+    "Usage: Extend this config in your .eslintrc.json:",
+    "  {",
+    "    \"extends\": [\"./.claude/templates/eslint/tailwind.eslintrc.json\"]",
+    "  }",
+    "",
+    "See: https://github.com/francoismassart/eslint-plugin-tailwindcss",
+    "============================================================================="
+  ],
+
+  "extends": ["plugin:tailwindcss/recommended"],
+
+  "plugins": ["tailwindcss"],
+
+  "settings": {
+    "tailwindcss": {
+      "config": "tailwind.config.ts",
+      "callees": ["classnames", "clsx", "cn", "cva", "twMerge", "twJoin"],
+      "whitelist": [],
+      "classRegex": "^class(Name)?$",
+      "ignoredKeys": ["compoundVariants", "defaultVariants"],
+      "tags": []
+    }
+  },
+
+  "rules": {
+    "tailwindcss/no-arbitrary-value": "error",
+    "tailwindcss/no-contradicting-classname": "error",
+    "tailwindcss/enforces-shorthand": "warn",
+    "tailwindcss/classnames-order": "warn",
+    "tailwindcss/no-custom-classname": "off",
+    "tailwindcss/no-unnecessary-arbitrary-value": "warn",
+    "tailwindcss/enforces-negative-arbitrary-values": "warn",
+    "tailwindcss/migration-from-tailwind-2": "off"
+  },
+
+  "overrides": [
+    {
+      "files": ["*.config.{js,ts,mjs,cjs}", "*.d.ts", "tailwind.config.*"],
+      "rules": {
+        "tailwindcss/no-arbitrary-value": "off"
+      }
+    }
+  ]
+}

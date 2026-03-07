@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/prettierrc",
+  "_comment": [
+    "Prettier Configuration with Tailwind CSS Class Sorting",
+    "",
+    "This configuration automatically sorts Tailwind classes in your code.",
+    "The plugin uses Tailwind's recommended class order for consistency.",
+    "",
+    "IMPORTANT: prettier-plugin-tailwindcss MUST be the last plugin in the array!",
+    "",
+    "For Tailwind v4:",
+    "- Use 'tailwindStylesheet' to point to your CSS file with @theme",
+    "",
+    "For Tailwind v3:",
+    "- Use 'tailwindConfig' to point to your tailwind.config.js/ts"
+  ],
+  "plugins": ["prettier-plugin-tailwindcss"],
+
+  "tailwindStylesheet": "./src/styles/theme.css",
+
+  "tailwindFunctions": ["clsx", "cn", "cva", "twMerge", "classnames"],
+
+  "tailwindAttributes": ["class", "className", "ngClass", ":class"],
+
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 100
+}

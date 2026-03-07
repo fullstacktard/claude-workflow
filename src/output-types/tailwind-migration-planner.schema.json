@@ -1,0 +1,140 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "tailwind-migration-planner-output",
+  "title": "Tailwind Migration Planner Agent Output Schema",
+  "description": "JSON output schema for tailwind-migration-planner agent. Extends agent-output-base.schema.json using allOf composition.",
+  "allOf": [
+    { "$ref": "../templates/.claude/schemas/agent-output-base.schema.json" }
+  ],
+  "type": "object",
+  "properties": {
+    "agent_type": {
+      "type": "string",
+      "enum": ["architecture"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "failure", "partial", "blocked"]
+    },
+    "discoveredConfig": {
+      "type": "object",
+      "description": "Configuration discovered during analysis",
+      "properties": {
+        "tailwind": {
+          "type": "object",
+          "properties": {
+            "configPath": { "type": ["string", "null"] },
+            "version": { "type": ["string", "null"], "enum": ["3", "4", null] },
+            "themePath": { "type": ["string", "null"] },
+            "themeTokens": {
+              "type": "object",
+              "properties": {
+                "colors": { "type": "array", "items": { "type": "string" } },
+                "spacing": { "type": "array", "items": { "type": "string" } },
+                "typography": { "type": "array", "items": { "type": "string" } },
+                "shadows": { "type": "array", "items": { "type": "string" } },
+                "radii": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "sourceStyles": {
+          "type": "object",
+          "properties": {
+            "vanillaCSS": { "type": "object" },
+            "scss": { "type": "object" },
+            "cssModules": { "type": "object" },
+            "styledComponents": { "type": "object" },
+            "inlineStyles": { "type": "object" }
+          }
+        }
+      }
+    },
+    "nextAction": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["spawn_agent", "wait", "complete"] },
+        "agent_type": { "type": "string", "enum": ["implementation", "architecture", "review"] },
+        "agent_name": { "type": "string" },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "campaign": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "strategy": { "type": "string", "enum": ["sequential", "file-parallel", "hybrid", "full-swarm"] },
+                "totalFiles": { "type": "number" },
+                "totalComplexity": { "type": "number" },
+                "specFilePath": { "type": "string" }
+              },
+              "required": ["id", "strategy", "totalFiles", "specFilePath"]
+            },
+            "themeTokens": { "type": "object" },
+            "cleanupStrategy": { "type": "string", "enum": ["delete-after-verification", "keep-originals", "comment-out"] },
+            "phases": { "type": "array", "items": { "type": "object" } },
+            "verification": {
+              "type": "object",
+              "properties": {
+                "afterEachPhase": { "type": "string" },
+                "beforeCleanup": { "type": "string" },
+                "rollbackOnFailure": { "type": "string" },
+                "finalChecks": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          },
+          "required": ["campaign", "phases", "verification"]
+        }
+      },
+      "required": ["type"]
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "execution_time_ms": { "type": "number" },
+        "tools_used": { "type": "array", "items": { "type": "string" } },
+        "context_sources": { "type": "array", "items": { "type": "string" } },
+        "warnings": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["execution_time_ms", "tools_used"]
+    },
+    "results": {
+      "type": "object",
+      "description": "Tailwind migration planner specific results",
+      "properties": {
+        "agent_type": {
+          "type": "string",
+          "enum": ["architecture"]
+        },
+        "architecture_decisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "decision": { "type": "string" },
+              "rationale": { "type": "string" },
+              "alternatives_considered": { "type": "array", "items": { "type": "string" } },
+              "impact": { "type": "string" }
+            },
+            "required": ["decision", "rationale", "alternatives_considered", "impact"]
+          }
+        }
+      },
+      "required": ["agent_type", "architecture_decisions"]
+    },
+    "blockers": {
+      "type": "array",
+      "description": "Blocking issues that prevent migration",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["TAILWIND_NOT_CONFIGURED", "NO_STYLE_FILES", "CONFIG_INVALID", "PERMISSION_DENIED"] },
+          "description": { "type": "string" },
+          "suggestedAction": { "type": "string" }
+        },
+        "required": ["type", "description", "suggestedAction"]
+      }
+    }
+  }
+}

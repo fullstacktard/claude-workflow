@@ -1,0 +1,370 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "demo-planner-output",
+  "title": "Demo Planner Agent Output Schema",
+  "description": "JSON output schema for demo-planner agent. Extends agent-output-base.schema.json using allOf composition. Outputs a complete video configuration for demo-recorder.",
+  "allOf": [
+    { "$ref": "../templates/.claude/schemas/agent-output-base.schema.json" }
+  ],
+  "type": "object",
+  "properties": {
+    "agent_type": {
+      "type": "string",
+      "description": "Agent category - wizard for interactive prompt builders",
+      "enum": ["wizard"]
+    },
+    "status": {
+      "type": "string",
+      "description": "Overall success/failure status of the agent execution",
+      "enum": ["success", "cancelled", "blocked", "error"],
+      "default": "success"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Agent-specific metadata including workflow tracking",
+      "additionalProperties": true,
+      "properties": {
+        "execution_time_ms": {
+          "type": "number",
+          "description": "Time taken for agent execution in milliseconds",
+          "minimum": 0
+        },
+        "tools_used": {
+          "type": "array",
+          "description": "List of tools used during execution",
+          "items": { "type": "string" }
+        },
+        "context_sources": {
+          "type": "array",
+          "description": "List of context sources consulted",
+          "items": { "type": "string" }
+        },
+        "workflow_id": {
+          "type": "string",
+          "description": "Workflow identifier for tracking multi-phase orchestration",
+          "pattern": "^[a-zA-Z0-9-_]+$"
+        },
+        "phases_completed": {
+          "type": "number",
+          "description": "Number of wizard phases completed (0-6)",
+          "minimum": 0,
+          "maximum": 6
+        }
+      }
+    },
+    "nextAction": {
+      "type": "object",
+      "description": "Orchestration instructions - spawn demo-recorder with payload",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of next action",
+          "enum": ["spawn_agent", "none"]
+        },
+        "agent_type": {
+          "type": "string",
+          "description": "Agent type to spawn",
+          "enum": ["demo-recording"]
+        },
+        "agent_name": {
+          "type": "string",
+          "description": "Agent to spawn",
+          "const": "demo-recorder"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"],
+          "default": "high"
+        },
+        "payload": {
+          "type": "object",
+          "description": "Complete video configuration for demo-recorder",
+          "properties": {
+            "runDir": {
+              "type": "string",
+              "description": "Gallery run directory path (e.g., .claude/video/demo/video-20260209-my-demo) where demo-recorder and demo-reviewer archive final artifacts"
+            },
+            "url": {
+              "type": ["string", "null"],
+              "description": "Target URL to demo. Required for web demos, optional for terminal demos (auto-resolves to ttyd).",
+              "format": "uri"
+            },
+            "terminal": {
+              "type": "object",
+              "description": "Terminal recording config. When set, url is optional (auto-resolves to ttyd). Uses keyboard actions for input.",
+              "properties": {
+                "ssh": {
+                  "type": "boolean",
+                  "description": "SSH to host machine (default: true if HOST_SSH_USER set)",
+                  "default": true
+                },
+                "prompt": {
+                  "type": "string",
+                  "description": "Regex to wait for shell prompt",
+                  "default": "\\$\\s*$"
+                },
+                "cd": {
+                  "type": "string",
+                  "description": "Directory to cd into after connection"
+                },
+                "fontSize": {
+                  "type": "number",
+                  "description": "xterm.js font size",
+                  "default": 22
+                },
+                "hideScrollbar": {
+                  "type": "boolean",
+                  "description": "Hide xterm scrollbar",
+                  "default": true
+                }
+              }
+            },
+            "platform": {
+              "type": "string",
+              "description": "Target distribution platform",
+              "enum": ["twitter", "instagram", "github", "general"]
+            },
+            "outputFormat": {
+              "type": "string",
+              "description": "Video output format",
+              "enum": ["mp4", "webm", "gif"],
+              "default": "mp4"
+            },
+            "scenes": {
+              "type": "array",
+              "description": "Ordered list of scenes to capture",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Scene display name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "What this scene shows"
+                  },
+                  "actions": {
+                    "type": "array",
+                    "description": "Actions to perform in this scene",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": ["click", "type", "scroll", "wait", "hover", "navigate", "keyboard"]
+                        },
+                        "selector": {
+                          "type": "string",
+                          "description": "CSS selector for click/type/hover targets"
+                        },
+                        "text": {
+                          "type": "string",
+                          "description": "Text to type (for type actions)"
+                        },
+                        "duration": {
+                          "type": "number",
+                          "description": "Duration in ms (for wait/scroll actions)"
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Scroll delta in pixels (for scroll actions)"
+                        },
+                        "url": {
+                          "type": "string",
+                          "description": "URL to navigate to (for navigate actions)"
+                        },
+                        "key": {
+                          "type": "string",
+                          "description": "Key to press (for keyboard actions, e.g. 'Enter', 'Tab', 'Control+c')"
+                        },
+                        "pressEnter": {
+                          "type": "boolean",
+                          "description": "Auto-press Enter after text (for keyboard actions)",
+                          "default": false
+                        },
+                        "charDelay": {
+                          "type": "number",
+                          "description": "Delay between characters in ms (for keyboard/type actions)"
+                        }
+                      },
+                      "required": ["type"]
+                    }
+                  }
+                },
+                "required": ["name", "description", "actions"]
+              }
+            },
+            "settings": {
+              "type": "object",
+              "description": "Visual and rendering settings",
+              "properties": {
+                "deviceFrame": {
+                  "type": "string",
+                  "enum": ["browser", "phone", "laptop", "tablet", "none"],
+                  "default": "browser"
+                },
+                "deviceFrameDark": {
+                  "type": "boolean",
+                  "default": true
+                },
+                "backgroundColor": {
+                  "type": "string",
+                  "description": "CSS color or gradient for background behind frame",
+                  "default": "linear-gradient(135deg, #667eea, #764ba2)"
+                },
+                "enableCursor": {
+                  "type": "boolean",
+                  "default": true
+                },
+                "enableZoom": {
+                  "type": "boolean",
+                  "default": true
+                },
+                "enableRipple": {
+                  "type": "boolean",
+                  "default": true
+                },
+                "enableMotionBlur": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "enableCaptions": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "captionPosition": {
+                  "type": "string",
+                  "enum": ["top", "center", "bottom"],
+                  "default": "bottom"
+                },
+                "capture_mode": {
+                  "type": "string",
+                  "description": "Capture mode: 'video' for live xvfb+ffmpeg recording (default), 'screenshot' only when explicitly requested",
+                  "enum": ["video", "screenshot"],
+                  "default": "video"
+                },
+                "quality": {
+                  "type": "string",
+                  "description": "Video quality setting - locked at maximum for xvfb+ffmpeg pipeline",
+                  "enum": ["maximum"],
+                  "default": "maximum"
+                },
+                "fps": {
+                  "type": "number",
+                  "description": "Frames per second - locked at 60 for xvfb+ffmpeg pipeline",
+                  "const": 60,
+                  "default": 60
+                },
+                "dimensions": {
+                  "type": "object",
+                  "description": "Video dimensions in pixels",
+                  "properties": {
+                    "width": { "type": "number", "minimum": 320 },
+                    "height": { "type": "number", "minimum": 240 }
+                  },
+                  "required": ["width", "height"]
+                }
+              }
+            },
+            "annotations": {
+              "type": "array",
+              "description": "Caption text overlays with timing",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "description": "Caption text to display"
+                  },
+                  "timing": {
+                    "type": "string",
+                    "description": "When to show (e.g., 'scene-1-start', 'after first click')"
+                  }
+                },
+                "required": ["text", "timing"]
+              },
+              "default": []
+            },
+            "audio": {
+              "type": "object",
+              "description": "Audio settings",
+              "properties": {
+                "backgroundMusic": {
+                  "type": ["string", "null"],
+                  "description": "Path to background music file",
+                  "default": null
+                },
+                "musicVolume": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.3
+                },
+                "soundEffects": {
+                  "type": "boolean",
+                  "default": false
+                }
+              }
+            },
+            "lottieOverlays": {
+              "type": "array",
+              "description": "Lottie animation overlays",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "src": { "type": "string" },
+                  "position": {
+                    "type": "object",
+                    "properties": {
+                      "x": { "type": "string", "enum": ["left", "center", "right"] },
+                      "y": { "type": "string", "enum": ["top", "center", "bottom"] }
+                    }
+                  },
+                  "startFrame": { "type": "number" },
+                  "durationFrames": { "type": "number" },
+                  "scale": { "type": "number", "default": 1 }
+                },
+                "required": ["src", "position"]
+              },
+              "default": []
+            }
+          },
+          "required": ["platform", "scenes", "settings"]
+        }
+      },
+      "required": ["type"]
+    },
+    "results": {
+      "type": "object",
+      "description": "Demo planner specific results",
+      "properties": {
+        "agent_type": {
+          "type": "string",
+          "const": "wizard"
+        },
+        "prompt_summary": {
+          "type": "object",
+          "description": "Summary of gathered configuration",
+          "properties": {
+            "url": { "type": "string" },
+            "platform": { "type": "string" },
+            "outputFormat": { "type": "string" },
+            "scene_count": { "type": "number", "minimum": 1 },
+            "effects_enabled": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "has_audio": { "type": "boolean" },
+            "has_lottie": { "type": "boolean" },
+            "is_terminal": { "type": "boolean" },
+            "has_voiceover": { "type": "boolean" }
+          },
+          "required": ["url", "platform", "scene_count"]
+        }
+      },
+      "required": ["agent_type", "prompt_summary"]
+    }
+  }
+}

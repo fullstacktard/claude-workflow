@@ -1,0 +1,230 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "research-planner-output",
+  "title": "Research Planner Agent Output Schema",
+  "description": "JSON output schema for research-planner agent. Extends agent-output-base.schema.json using allOf composition. Outputs research topics for parallel research agent dispatch.",
+  "allOf": [
+    { "$ref": "../templates/.claude/schemas/agent-output-base.schema.json" }
+  ],
+  "type": "object",
+  "properties": {
+    "agent_type": {
+      "type": "string",
+      "description": "Agent category - restricted to architecture for research-planner",
+      "enum": ["architecture"]
+    },
+    "status": {
+      "type": "string",
+      "description": "Overall success/failure status of the agent execution",
+      "enum": ["success", "failure", "partial", "blocked", "skipped"],
+      "default": "success"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Research-planner-specific metadata including analysis tracking",
+      "additionalProperties": true,
+      "properties": {
+        "execution_time_ms": {
+          "type": "number",
+          "description": "Time taken for agent execution in milliseconds",
+          "minimum": 0
+        },
+        "tools_used": {
+          "type": "array",
+          "description": "List of tools and MCP services used during execution",
+          "items": {"type": "string"}
+        },
+        "context_sources": {
+          "type": "array",
+          "description": "List of context sources consulted (files, documentation)",
+          "items": {"type": "string"}
+        },
+        "workflow_id": {
+          "type": "string",
+          "description": "Workflow identifier for tracking multi-phase orchestration. Propagated to spawned research agents.",
+          "pattern": "^[a-zA-Z0-9-_]+$",
+          "examples": ["workflow-1705849200000"]
+        },
+        "debug_info": {
+          "type": "object",
+          "description": "Additional debug information for troubleshooting",
+          "additionalProperties": true,
+          "properties": {
+            "angles_analyzed": {
+              "type": "number",
+              "description": "Number of analysis angles evaluated",
+              "minimum": 1,
+              "maximum": 8
+            },
+            "topics_generated": {
+              "type": "number",
+              "description": "Number of research topics generated",
+              "minimum": 1
+            },
+            "angles_with_no_topics": {
+              "type": "array",
+              "description": "Angles that were analyzed but produced no research topics",
+              "items": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "nextAction": {
+      "type": "object",
+      "description": "Orchestration instructions - research-planner always spawns research agents",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of next action to perform",
+          "enum": ["spawn_agent", "user_input"]
+        },
+        "agent_type": {
+          "type": "string",
+          "description": "Agent type to spawn",
+          "enum": ["research"]
+        },
+        "agent_name": {
+          "type": "string",
+          "description": "Specific agent name to spawn",
+          "enum": ["research"]
+        },
+        "priority": {
+          "type": "string",
+          "description": "Priority level for the next action",
+          "enum": ["low", "medium", "high", "critical"],
+          "default": "high"
+        },
+        "payload": {
+          "type": "object",
+          "description": "Data payload containing research specification",
+          "additionalProperties": true,
+          "properties": {
+            "workflow_id": {
+              "type": "string",
+              "description": "Workflow identifier propagated to spawned research agents",
+              "pattern": "^[a-zA-Z0-9-_]+$"
+            },
+            "research_spec": {
+              "type": "object",
+              "description": "Research specification with topics for parallel dispatch",
+              "properties": {
+                "feature_request_summary": {
+                  "type": "string",
+                  "description": "Brief summary of the original feature request",
+                  "minLength": 10
+                },
+                "topics": {
+                  "type": "array",
+                  "description": "Research topics to dispatch to parallel research agents",
+                  "minItems": 3,
+                  "maxItems": 8,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Unique topic identifier",
+                        "pattern": "^topic-[0-9]+$"
+                      },
+                      "title": {
+                        "type": "string",
+                        "description": "Short descriptive title for the research topic",
+                        "minLength": 10,
+                        "maxLength": 100
+                      },
+                      "prompt": {
+                        "type": "string",
+                        "description": "Detailed, self-contained research brief. The research agent works from this prompt alone.",
+                        "minLength": 200
+                      },
+                      "depth": {
+                        "type": "string",
+                        "description": "Research depth level",
+                        "enum": ["quick", "detailed", "comprehensive"]
+                      },
+                      "angles": {
+                        "type": "array",
+                        "description": "Which analysis angles this topic addresses",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "technical_feasibility",
+                            "architecture_impact",
+                            "security",
+                            "performance",
+                            "ux_dx",
+                            "competitive",
+                            "edge_cases",
+                            "codebase_specific"
+                          ]
+                        },
+                        "minItems": 1
+                      },
+                      "requires_codebase_exploration": {
+                        "type": "boolean",
+                        "description": "Whether the research agent needs to read project files"
+                      },
+                      "priority": {
+                        "type": "number",
+                        "description": "Priority order (1 = highest). Determines research order if sequential fallback needed.",
+                        "minimum": 1
+                      }
+                    },
+                    "required": ["id", "title", "prompt", "depth", "angles", "requires_codebase_exploration", "priority"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["feature_request_summary", "topics"]
+            }
+          }
+        }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+    "results": {
+      "type": "object",
+      "description": "Research planner specific results",
+      "properties": {
+        "agent_type": {
+          "type": "string",
+          "const": "architecture"
+        },
+        "research_plan": {
+          "type": "object",
+          "description": "Summary of the research plan for tracking",
+          "properties": {
+            "feature_request_summary": {
+              "type": "string",
+              "description": "Brief summary of the original feature request"
+            },
+            "total_topics": {
+              "type": "number",
+              "description": "Total number of research topics generated",
+              "minimum": 3,
+              "maximum": 8
+            },
+            "topic_summaries": {
+              "type": "array",
+              "description": "Summary of each topic for quick reference",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {"type": "string"},
+                  "title": {"type": "string"},
+                  "depth": {"type": "string", "enum": ["quick", "detailed", "comprehensive"]},
+                  "priority": {"type": "number"}
+                },
+                "required": ["id", "title", "depth", "priority"]
+              }
+            }
+          },
+          "required": ["feature_request_summary", "total_topics", "topic_summaries"]
+        }
+      },
+      "required": ["agent_type", "research_plan"]
+    }
+  }
+}

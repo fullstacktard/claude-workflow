@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@fst/claude-proxy": ["../claude-proxy/src/index.ts"],
+      "@fst/claude-proxy/*": ["../claude-proxy/src/*"]
+    },
+    "typeRoots": ["./node_modules/@types", "./src/types", "../../node_modules/@types"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.mts", "src/**/*.cts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "**/dashboard/frontend/**",
+    "src/lib/commands/proxy.ts",
+    "tests/**",
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "vitest.config.ts"
+  ]
+}

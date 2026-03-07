@@ -1,0 +1,44 @@
+/**
+ * DependencyGraph Component Styles
+ * React Flow override styles only - component layout uses Tailwind utilities
+ */
+
+/* React Flow control buttons override */
+.react-flow-controls {
+  background: oklch(0.145 0 0);
+  border: 1px solid oklch(0.444 0.177 26.899);
+  border-radius: 0.375rem;
+}
+
+.react-flow-controls .react-flow__controls-button {
+  background: oklch(0.145 0 0);
+  border: none;
+  border-bottom: 1px solid oklch(0.444 0.177 26.899);
+  color: oklch(0.551 0.027 264.364);
+}
+
+.react-flow-controls .react-flow__controls-button:hover {
+  background: oklch(0.269 0 0);
+}
+
+.react-flow-controls .react-flow__controls-button:last-child {
+  border-bottom: none;
+}
+
+.react-flow-controls .react-flow__controls-button svg {
+  fill: currentColor;
+}
+
+/* MiniMap background override */
+.react-flow-minimap {
+  background: oklch(0.145 0 0 / 80%) !important;
+  border: 1px solid oklch(0.444 0.177 26.899) !important;
+  border-radius: 0.375rem !important;
+}
+
+/* Responsive: Hide minimap on mobile */
+@media (max-width: 768px) {
+  .react-flow-minimap {
+    display: none;
+  }
+}

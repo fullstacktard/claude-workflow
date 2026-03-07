@@ -1,0 +1,236 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "research-output",
+  "title": "Research Agent Output Schema",
+  "description": "JSON output schema for research agent. Extends agent-output-base.schema.json using allOf composition.",
+  "allOf": [
+    { "$ref": "../templates/.claude/schemas/agent-output-base.schema.json" }
+  ],
+  "type": "object",
+  "properties": {
+    "agent_type": {
+      "type": "string",
+      "description": "Agent category - restricted to research",
+      "enum": ["research"]
+    },
+    "status": {
+      "type": "string",
+      "description": "Overall success/failure status of the agent execution",
+      "enum": ["success", "failure", "partial", "blocked", "skipped"],
+      "default": "success"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Research-specific metadata including depth tracking and source counts",
+      "additionalProperties": true,
+      "properties": {
+        "execution_time_ms": {
+          "type": "number",
+          "description": "Time taken for agent execution in milliseconds",
+          "minimum": 0
+        },
+        "tools_used": {
+          "type": "array",
+          "description": "List of tools and MCP services used during execution",
+          "items": {"type": "string"}
+        },
+        "context_sources": {
+          "type": "array",
+          "description": "List of context sources consulted (files, documentation, MCP services)",
+          "items": {"type": "string"}
+        },
+        "research_depth": {
+          "type": "string",
+          "description": "Depth level of research conducted",
+          "enum": ["quick", "detailed", "comprehensive"]
+        },
+        "passes_completed": {
+          "type": "number",
+          "description": "Number of research passes completed",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "sources_consulted": {
+          "type": "number",
+          "description": "Total number of unique sources consulted",
+          "minimum": 0
+        },
+        "debug_info": {
+          "type": "object",
+          "description": "Additional debug information for troubleshooting",
+          "additionalProperties": true
+        }
+      }
+    },
+    "nextAction": {
+      "type": "object",
+      "description": "Orchestration instructions - research chains to feature-planner, task-maker, or returns none",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of next action to perform",
+          "enum": ["spawn_agent", "none", "user_input"]
+        },
+        "agent_type": {
+          "type": "string",
+          "description": "Agent type to spawn when type=spawn_agent",
+          "enum": ["task-management", "implementation", "architecture", "research"]
+        },
+        "agent_name": {
+          "type": "string",
+          "description": "Specific agent name to spawn (feature-planner, task-maker, or research for deeper pass)",
+          "examples": ["feature-planner", "task-maker", "research"]
+        },
+        "priority": {
+          "type": "string",
+          "description": "Priority level for the next action",
+          "enum": ["low", "medium", "high", "critical"],
+          "default": "medium"
+        },
+        "payload": {
+          "type": "object",
+          "description": "Data payload for the next action",
+          "additionalProperties": true,
+          "properties": {
+            "task_spec": {
+              "type": "object",
+              "description": "Task specification for task creation"
+            },
+            "user_question": {
+              "type": "string",
+              "description": "Question to ask user when type=user_input"
+            },
+            "context": {
+              "type": "string",
+              "description": "Research context to pass to spawned agent"
+            },
+            "research_summary": {
+              "type": "string",
+              "description": "Summary of research findings for downstream agents"
+            }
+          }
+        }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+    "results": {
+      "type": "object",
+      "description": "Research agent results with structured report",
+      "properties": {
+        "agent_type": {
+          "type": "string",
+          "const": "research"
+        },
+        "research_report": {
+          "type": "object",
+          "description": "Structured research report with findings, comparisons, and recommendations",
+          "properties": {
+            "topic": {
+              "type": "string",
+              "description": "Research topic or question"
+            },
+            "depth": {
+              "type": "string",
+              "description": "Depth level of research",
+              "enum": ["quick", "detailed", "comprehensive"]
+            },
+            "goal": {
+              "type": "string",
+              "description": "Research goal category",
+              "enum": ["library_comparison", "best_practices", "technical_decision", "implementation_guide"]
+            },
+            "questions": {
+              "type": "array",
+              "description": "Research questions addressed",
+              "items": {"type": "string"}
+            },
+            "findings": {
+              "type": "array",
+              "description": "Individual research findings with confidence and source quality",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {"type": "string"},
+                  "summary": {"type": "string"},
+                  "confidence": {
+                    "type": "number",
+                    "description": "Confidence in this finding (0-1)",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "sources": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "url": {"type": "string"},
+                        "title": {"type": "string"},
+                        "quality_tier": {
+                          "type": "string",
+                          "description": "Source quality classification",
+                          "enum": ["authoritative", "established", "community", "general"]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "comparison_matrix": {
+              "type": "object",
+              "description": "Comparison table for library/option evaluations (detailed+comprehensive depths)",
+              "properties": {
+                "criteria": {
+                  "type": "array",
+                  "description": "Evaluation criteria labels",
+                  "items": {"type": "string"}
+                },
+                "options": {
+                  "type": "array",
+                  "description": "Options with per-criteria scores/notes",
+                  "items": {"type": "object"}
+                }
+              }
+            },
+            "recommendation": {
+              "type": "object",
+              "description": "Final recommendation with rationale",
+              "properties": {
+                "primary": {
+                  "type": "string",
+                  "description": "Primary recommended option"
+                },
+                "rationale": {
+                  "type": "string",
+                  "description": "Why this recommendation"
+                },
+                "alternatives": {
+                  "type": "array",
+                  "description": "Alternative options with when-to-use context",
+                  "items": {"type": "string"}
+                },
+                "risks": {
+                  "type": "array",
+                  "description": "Known risks and mitigation strategies",
+                  "items": {"type": "string"}
+                },
+                "next_steps": {
+                  "type": "array",
+                  "description": "Actionable next steps",
+                  "items": {"type": "string"}
+                }
+              }
+            },
+            "report_path": {
+              "type": "string",
+              "description": "File path where the full markdown report was saved"
+            }
+          },
+          "required": ["topic", "depth", "goal", "findings"]
+        }
+      },
+      "required": ["agent_type", "research_report"]
+    }
+  }
+}

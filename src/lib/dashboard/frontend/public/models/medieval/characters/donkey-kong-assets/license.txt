@@ -1,0 +1,11 @@
+Model Information:
+* title:	Donkey Kong 64
+* source:	https://sketchfab.com/3d-models/donkey-kong-64-131973a2107e45e8a61822c556f252f2
+* author:	chicosantossaraiva (https://sketchfab.com/chicosantossaraiva)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Donkey Kong 64" (https://sketchfab.com/3d-models/donkey-kong-64-131973a2107e45e8a61822c556f252f2) by chicosantossaraiva (https://sketchfab.com/chicosantossaraiva) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

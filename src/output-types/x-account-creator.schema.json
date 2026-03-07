@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "X Account Creator Output",
+  "description": "Structured output from the x-account-creator agent with batch creation results",
+  "type": "object",
+  "required": ["status", "accounts_requested", "accounts_created", "accounts_failed", "results"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["completed", "partial", "failed"],
+      "description": "Overall batch status"
+    },
+    "accounts_requested": {
+      "type": "integer",
+      "description": "Number of accounts requested for creation"
+    },
+    "accounts_created": {
+      "type": "integer",
+      "description": "Number of accounts successfully created"
+    },
+    "accounts_failed": {
+      "type": "integer",
+      "description": "Number of accounts that failed to create"
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["handle", "success"],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Requested handle for the account"
+          },
+          "account_id": {
+            "type": ["string", "null"],
+            "description": "UUID of the created account in the vault"
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Whether the account was successfully created"
+          },
+          "state": {
+            "type": "string",
+            "enum": ["created", "email_verified", "phone_verified", "profile_setup", "warming", "active"],
+            "description": "Account state after creation"
+          },
+          "has_cookies": {
+            "type": "boolean",
+            "description": "Whether auth cookies were harvested"
+          },
+          "error": {
+            "type": ["string", "null"],
+            "description": "Error message if creation failed"
+          },
+          "step_failed": {
+            "type": ["string", "null"],
+            "description": "Which signup step failed"
+          },
+          "retries": {
+            "type": "integer",
+            "description": "Number of retry attempts"
+          }
+        }
+      }
+    },
+    "cost_estimate_usd": {
+      "type": "number",
+      "description": "Estimated cost of all creation attempts in USD"
+    },
+    "duration_seconds": {
+      "type": "number",
+      "description": "Total time taken for all creation attempts"
+    }
+  }
+}

@@ -1,0 +1,872 @@
+/**
+ * Dashboard Global Styles - Tailwind v4 CSS-first Configuration
+ *
+ * This file defines the complete design system using @theme inline directive.
+ * All design tokens are consolidated here for Tailwind utility generation.
+ *
+ * COLOR FORMAT: OKLCH (Oklab Lightness Chroma Hue)
+ * Benefits: Perceptual uniformity - colors at same lightness appear equally bright
+ *
+ * TOKEN STRUCTURE:
+ * - Colors: --color-* (backgrounds, text, borders, status)
+ * - Spacing: --spacing-* (margins, padding, gaps)
+ * - Typography: --font-*, --line-height-*
+ * - Radius: --radius-*
+ *
+ * UTILITY CLASSES GENERATED:
+ *   --color-primary enables: bg-primary, text-primary, border-primary
+ *   --spacing-md enables: p-md, m-md, gap-md
+ *   --radius-lg enables: rounded-lg
+ */
+
+@import "tailwindcss";
+
+/* Safelist agent color classes - dynamically applied via getAgentColorClass()
+ * Must be explicitly included since Tailwind can't detect them at build time */
+@source inline("text-blue-400 text-cyan-400 text-green-400 text-orange-400 text-pink-400 text-purple-400 text-red-400 text-yellow-400 text-gray-400");
+
+/* Self-hosted Geist fonts via Fontsource - avoids CDN MIME type issues */
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+/* ============================================
+ * DESIGN TOKENS - @theme inline
+ * ============================================
+ * All design tokens consolidated here for single source of truth.
+ * Tailwind generates utility classes from these variables.
+ */
+@theme inline {
+  /* ----- Custom Breakpoints ----- */
+  --breakpoint-3xl: 1920px;
+
+  /* ----- Typography ----- */
+  /* Fontsource variable fonts use 'Geist Variable' and 'Geist Mono Variable' family names */
+  --font-sans: 'Geist Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+
+  /* ============================================
+   * COLOR SYSTEM - OKLCH for perceptual uniformity
+   * ============================================ */
+
+  /* ----- Core Surface Colors ----- */
+  --color-background: oklch(0.145 0 0);           /* gray-950 equivalent - main app background */
+  --color-foreground: oklch(0.985 0 0);           /* near white - primary text color */
+
+  /* ----- Primary - Red accent theme ----- */
+  --color-primary: oklch(0.704 0.191 22.216);     /* Tailwind red-400 */
+  --color-primary-foreground: oklch(0.145 0 0);
+  --color-primary-light: oklch(0.808 0.114 19.571);  /* red-300 */
+  --color-primary-dark: oklch(0.444 0.177 26.899);   /* red-800 */
+
+  /* ----- Accent ----- */
+  --color-accent: oklch(0.269 0 0);
+  --color-accent-foreground: oklch(0.985 0 0);
+
+  /* ----- Border & Input ----- */
+  --color-border: oklch(0.444 0.177 26.899);      /* red-800 */
+  --color-input: oklch(0.269 0 0);
+  --color-ring: oklch(0.704 0.191 22.216 / 0.5);  /* red-400/50 */
+
+  /* ----- Semantic Status Colors ----- */
+  /* Success: Green - positive actions, confirmations */
+  --color-success: oklch(0.732 0.164 142.495);    /* Tailwind green-400 */
+  --color-success-foreground: oklch(0.145 0 0);
+
+  /* Error: Red - errors, destructive actions */
+  --color-error: oklch(0.704 0.191 22.216);       /* Tailwind red-400 */
+  --color-error-foreground: oklch(0.985 0 0);
+
+  /* Warning: Yellow - caution, pending states */
+  --color-warning: oklch(0.814 0.177 85.068);     /* Tailwind yellow-400 */
+  --color-warning-foreground: oklch(0.145 0 0);
+
+  /* Muted: Gray - secondary, disabled */
+  --color-muted: oklch(0.435 0 0);                /* Tailwind gray-500 */
+  --color-muted-foreground: oklch(0.985 0 0);
+
+  /* ----- Workflow Status Colors (OKLCH) ----- */
+  /* Used in DependencyGraph and status indicators */
+  --color-status-completed: oklch(0.723 0.176 142.495);   /* green-500 */
+  --color-status-running: oklch(0.623 0.214 259.815);     /* blue-500 */
+  --color-status-waiting: oklch(0.795 0.184 86.047);      /* yellow-500 */
+  --color-status-blocked: oklch(0.637 0.237 25.331);      /* red-500 */
+  --color-status-error: oklch(0.637 0.237 25.331);        /* red-500 */
+  --color-status-pending: oklch(0.551 0.027 264.364);     /* gray-500 */
+  --color-status-queued: oklch(0.714 0.203 305.504);      /* purple-500 */
+
+  /* ----- Neutral Colors ----- */
+  --color-neutral-border: oklch(0.373 0.034 257.287);     /* gray-700 (#374151) */
+  --color-neutral-bg: oklch(0.269 0.015 264.436);         /* gray-800 (#1f2937) */
+
+  /* ============================================
+   * SPACING SCALE
+   * ============================================
+   * Semantic spacing tokens for consistent layouts.
+   * Maps to p-*, m-*, gap-*, etc. utilities.
+   */
+  --spacing-xs: 0.25rem;    /* 4px */
+  --spacing-sm: 0.5rem;     /* 8px */
+  --spacing-md: 1rem;       /* 16px */
+  --spacing-lg: 1.5rem;     /* 24px */
+  --spacing-xl: 2rem;       /* 32px */
+  --spacing-2xl: 3rem;      /* 48px */
+
+  /* ============================================
+   * BORDER RADIUS
+   * ============================================
+   * Consistent rounding across UI components.
+   */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 0.5rem;      /* 8px - default radius */
+  --radius-xl: 12px;
+  --radius-full: 9999px;    /* fully rounded / pills */
+
+  /* ============================================
+   * MAX-WIDTH SCALE
+   * ============================================
+   * Standard Tailwind max-width utilities for modals,
+   * containers, and responsive layouts.
+   * Required in @theme inline since defaults aren't included.
+   */
+  --max-width-xs: 20rem;    /* 320px */
+  --max-width-sm: 24rem;    /* 384px */
+  --max-width-md: 28rem;    /* 448px */
+  --max-width-lg: 32rem;    /* 512px */
+  --max-width-xl: 36rem;    /* 576px - modal default */
+  --max-width-2xl: 42rem;   /* 672px */
+  --max-width-3xl: 48rem;   /* 768px */
+  --max-width-4xl: 56rem;   /* 896px */
+  --max-width-5xl: 64rem;   /* 1024px */
+  --max-width-6xl: 72rem;   /* 1152px */
+  --max-width-7xl: 80rem;   /* 1280px */
+  --max-width-full: 100%;
+  --max-width-none: none;
+
+  /* ============================================
+   * WIDTH SCALE
+   * ============================================
+   * Standard width utilities needed for layouts.
+   */
+  --width-full: 100%;
+  --width-screen: 100vw;
+  --width-min: min-content;
+  --width-max: max-content;
+  --width-fit: fit-content;
+}
+
+/* ============================================
+ * NON-THEME CSS VARIABLES
+ * ============================================
+ * Variables that reference @theme tokens or define
+ * component-specific values not suitable for @theme.
+ * These are NOT Tailwind utility generators.
+ */
+:root {
+  /* Translucent backgrounds - use alpha variants of @theme colors */
+  --background-translucent: oklch(0.145 0 0 / 0.5);     /* background/50 */
+  --foreground-muted: oklch(0.869 0 0);                 /* gray-300 equivalent */
+  --minimap-mask: oklch(0 0 0 / 0.8);
+
+  /* Success/Error background variants with alpha */
+  --success-bg: oklch(0.732 0.164 142.495 / 0.1);       /* success/10 */
+  --success-border: oklch(0.732 0.164 142.495 / 0.3);   /* success/30 */
+  --error-bg: oklch(0.396 0.141 25.723 / 0.2);          /* red-900/20 */
+  --error-border: oklch(0.396 0.141 25.723 / 0.6);      /* red-900/60 */
+
+  /* Dashboard layout uses flexbox with flex-grow ratios for 20/40/40 split
+   * No fixed pixel calculations needed - flexbox handles distribution */
+}
+
+/* ============================================
+ * BASE LAYER STYLES
+ * ============================================ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    scrollbar-color: var(--color-primary-dark) var(--color-background);
+    scrollbar-width: thin;
+  }
+
+  /* Override Tailwind's universal reset for our component classes.
+   * Tailwind v4 sets * { border: 0 solid; padding: 0; margin: 0 } which has
+   * higher layer priority than @layer components. By adding this override in
+   * base (after Tailwind's base import), we restore normal behavior.
+   *
+   * NOTE: Only includes classes that are actually used in the codebase.
+   * Unused semantic classes have been converted to inline Tailwind utilities.
+   */
+  .dashboard-layout,
+  .dashboard-loading,
+  .dashboard-widget-container,
+  .filter-toggle {
+    border-width: revert-layer;
+    border-style: revert-layer;
+    border-color: revert-layer;
+    padding: revert-layer;
+    margin: revert-layer;
+  }
+
+  /* Ensure Tailwind's divide-y utilities apply red-800 border between rows */
+  .divide-y > * + * {
+    border-top-width: 1px !important;
+    border-top-style: solid !important;
+  }
+
+  .divide-y.divide-red-800 > * + * {
+    border-top-color: oklch(0.444 0.177 26.899) !important;
+  }
+
+  .divide-y.divide-red-800\/50 > * + * {
+    border-top-color: oklch(0.444 0.177 26.899 / 0.5) !important;
+  }
+
+  /* Spinner needs its own border-color to create the two-tone gray/red effect.
+   * Override the universal * { border-color: var(--border) } rule.
+   * Explicitly set border-width to maintain proper spinner appearance.
+   */
+  .spinner {
+    border-width: 2px;
+    border-style: solid;
+    padding: 0;
+    /* Explicit border colors for two-tone spinner effect */
+    border-color: var(--color-gray-600, oklch(44.6% .03 256.802));
+    border-top-color: var(--color-red-500, oklch(63.7% .237 25.331));
+    /* Ensure spinner maintains circular shape */
+    aspect-ratio: 1;
+    border-radius: 9999px;
+  }
+
+  html {
+    @apply bg-gray-950;
+  }
+
+  body {
+    @apply bg-gray-950 text-foreground font-mono;
+  }
+
+  /* Custom red scrollbar - WebKit browsers */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-primary-dark);
+    border-radius: var(--radius-sm);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
+  }
+
+  /* All buttons should have cursor pointer and proper vertical alignment */
+  button {
+    cursor: pointer;
+    line-height: var(--line-height-tight);
+  }
+}
+
+/* ============================================
+ * UTILITY CLASSES
+ * ============================================ */
+
+/* Match xterm viewport background to terminal theme -- prevents visible seam
+ * at character-cell rounding gaps (FitAddon rounds to whole rows/cols) */
+.xterm-viewport {
+  background-color: #030712 !important;
+}
+
+/* Hidden scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+/* Slim scrollbar - visible but unobtrusive (6px) */
+.scrollbar-slim {
+  scrollbar-width: thin;  /* Firefox */
+  scrollbar-color: var(--color-primary-dark) transparent;
+}
+
+.scrollbar-slim::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-slim::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-slim::-webkit-scrollbar-thumb {
+  background: var(--color-primary-dark);
+  border-radius: 3px;
+}
+
+.scrollbar-slim::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* Horizontal scroll fade indicator - shows gradient at edge when content overflows
+ * Applied to parent container that has overflow-x-auto
+ * Use lg:after:hidden to disable on desktop viewports */
+.scroll-fade-x {
+  position: relative;
+}
+
+.scroll-fade-x::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  background: linear-gradient(to left, rgb(17 24 39 / 0.95), transparent);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Custom select dropdown chevron styling
+ * Used for styled <select> elements with custom dropdown arrow */
+.select-chevron {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239CA3AF' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.25rem 1.25rem;
+}
+
+
+/* ============================================
+ * TOAST ANIMATIONS
+ * ============================================
+ * Keyframe animations cannot be expressed as pure Tailwind utilities.
+ * These must remain in CSS.
+ */
+@keyframes toast-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-toast-slide-in {
+  animation: toast-slide-in 0.3s ease-out forwards;
+}
+
+.animate-toast-slide-out {
+  animation: toast-slide-out 0.2s ease-in forwards;
+}
+
+/* Mobile menu animations */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.2s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out forwards;
+}
+
+/* ============================================
+ * MEDIEVAL UI THEME STYLES
+ * ============================================
+ * Parchment, scrolls, stone buttons, and Gothic styling
+ * for the AgentVisualization page.
+ *
+ * COLOR PALETTE:
+ * - Parchment: #f5e6c8, #e8d4a8
+ * - Borders: #8b4513 (saddle brown), #654321 (dark brown)
+ * - Text: #2d1f14 (dark brown), #4a3728 (medium brown)
+ * - Accents: #c9a227 (gold), #6b0000 (deep red for wax seals)
+ */
+
+/* Medieval Panel - Parchment background with ornate border */
+.medieval-panel {
+  background:
+    linear-gradient(135deg, #f5e6c8 0%, #e8d4a8 50%, #dcc898 100%);
+  border: 3px solid #654321;
+  border-radius: 4px;
+  position: relative;
+  box-shadow:
+    inset 0 0 20px rgba(139, 69, 19, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px #8b4513;
+}
+
+/* Parchment texture overlay */
+.medieval-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.5;
+  border-radius: 2px;
+}
+
+/* Aged/torn paper edge effect */
+.medieval-panel::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background:
+    radial-gradient(ellipse at 0% 0%, transparent 70%, rgba(101, 67, 33, 0.1) 100%),
+    radial-gradient(ellipse at 100% 0%, transparent 70%, rgba(101, 67, 33, 0.1) 100%),
+    radial-gradient(ellipse at 0% 100%, transparent 70%, rgba(101, 67, 33, 0.15) 100%),
+    radial-gradient(ellipse at 100% 100%, transparent 70%, rgba(101, 67, 33, 0.15) 100%);
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+/* Wax seal decoration for corners */
+.medieval-seal {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: radial-gradient(circle at 40% 40%, #8b0000 0%, #6b0000 60%, #4a0000 100%);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.medieval-seal::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  background: radial-gradient(circle at 30% 30%, #a00000 0%, #6b0000 100%);
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Medieval Header - Gothic style text */
+.medieval-header {
+  font-family: 'Times New Roman', 'Georgia', serif;
+  color: #2d1f14;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  position: relative;
+}
+
+/* Decorative underline for headers */
+.medieval-header::after {
+  content: '';
+  display: block;
+  width: 80%;
+  height: 2px;
+  margin-top: 4px;
+  background: linear-gradient(90deg, transparent 0%, #8b4513 20%, #c9a227 50%, #8b4513 80%, transparent 100%);
+}
+
+/* Medieval Scroll - Banner/scroll background for stats */
+.medieval-scroll {
+  background:
+    linear-gradient(180deg, #f5e6c8 0%, #e8d4a8 20%, #dcc898 80%, #c9b888 100%);
+  border: 2px solid #8b4513;
+  border-radius: 2px;
+  position: relative;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(139, 69, 19, 0.2),
+    0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Scroll curl effect at top and bottom */
+.medieval-scroll::before,
+.medieval-scroll::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  height: 8px;
+  background: linear-gradient(90deg,
+    #654321 0%,
+    #8b4513 10%,
+    #a0522d 50%,
+    #8b4513 90%,
+    #654321 100%
+  );
+  border-radius: 50%;
+}
+
+.medieval-scroll::before {
+  top: -4px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+}
+
+.medieval-scroll::after {
+  bottom: -4px;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.15);
+}
+
+/* Medieval Stat display with heraldic icon styling */
+.medieval-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2d1f14;
+  font-family: 'Times New Roman', 'Georgia', serif;
+}
+
+.medieval-stat-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #c9a227 0%, #a08020 100%);
+  border: 1px solid #8b4513;
+  border-radius: 2px;
+  font-size: 12px;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.medieval-stat-value {
+  font-weight: 700;
+  color: #654321;
+}
+
+.medieval-stat-label {
+  color: #4a3728;
+  font-size: 0.875em;
+}
+
+/* Medieval Button - Stone appearance with embossed effect */
+.medieval-button {
+  background:
+    linear-gradient(180deg, #9a9a9a 0%, #7a7a7a 40%, #6a6a6a 60%, #5a5a5a 100%);
+  border: 2px solid #4a4a4a;
+  border-radius: 4px;
+  color: #f5e6c8;
+  font-family: 'Times New Roman', 'Georgia', serif;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 0 0 1px #3a3a3a;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.15s ease;
+}
+
+/* Stone texture */
+.medieval-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.medieval-button:hover {
+  background:
+    linear-gradient(180deg, #aaaaaa 0%, #8a8a8a 40%, #7a7a7a 60%, #6a6a6a 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(201, 162, 39, 0.3),
+    0 0 12px rgba(201, 162, 39, 0.2),
+    0 0 0 1px #4a4a4a;
+}
+
+.medieval-button:active {
+  background:
+    linear-gradient(180deg, #6a6a6a 0%, #5a5a5a 40%, #5a5a5a 60%, #4a4a4a 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+  transform: translateY(1px);
+}
+
+/* Medieval Status Indicator - Wooden placard style */
+.medieval-placard {
+  background:
+    linear-gradient(180deg, #8b6914 0%, #6b4f0f 30%, #5b3f08 70%, #4b2f00 100%);
+  border: 2px solid #3b2500;
+  border-radius: 3px;
+  position: relative;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 3px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* Wood grain texture */
+.medieval-placard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    rgba(0, 0, 0, 0.05) 1px,
+    transparent 2px,
+    transparent 8px
+  );
+  pointer-events: none;
+}
+
+.medieval-placard-text {
+  color: #f5e6c8;
+  font-family: 'Times New Roman', 'Georgia', serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Lantern/torch icon for connection status */
+.medieval-lantern {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  position: relative;
+}
+
+.medieval-lantern::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 10px;
+  background: linear-gradient(180deg, #4a3728 0%, #2d1f14 100%);
+  border-radius: 2px 2px 0 0;
+}
+
+.medieval-lantern::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 4px 2px currentColor;
+  background: currentColor;
+  opacity: 0.8;
+}
+
+.medieval-lantern--connected {
+  color: #4ade80;
+}
+
+.medieval-lantern--reconnecting {
+  color: #facc15;
+  animation: lantern-flicker 0.5s infinite alternate;
+}
+
+.medieval-lantern--disconnected {
+  color: #6b7280;
+}
+
+@keyframes lantern-flicker {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* Celtic knot border decoration */
+.medieval-border-ornate {
+  border-image: repeating-linear-gradient(
+    45deg,
+    #8b4513 0px,
+    #654321 4px,
+    #c9a227 8px,
+    #654321 12px,
+    #8b4513 16px
+  ) 8;
+}
+
+/* Iron band border decoration */
+.medieval-border-iron {
+  position: relative;
+}
+
+.medieval-border-iron::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border: 3px solid transparent;
+  background:
+    linear-gradient(90deg, #3a3a3a 0%, #5a5a5a 50%, #3a3a3a 100%) padding-box,
+    linear-gradient(90deg, #2a2a2a, #6a6a6a, #2a2a2a) border-box;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Medieval checkbox styling */
+.medieval-checkbox {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #f5e6c8 0%, #dcc898 100%);
+  border: 2px solid #8b4513;
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+}
+
+.medieval-checkbox:checked {
+  background: linear-gradient(135deg, #c9a227 0%, #a08020 100%);
+}
+
+.medieval-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid #2d1f14;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Medieval select dropdown */
+.medieval-select {
+  appearance: none;
+  background:
+    linear-gradient(180deg, #f5e6c8 0%, #e8d4a8 100%);
+  border: 2px solid #8b4513;
+  border-radius: 3px;
+  color: #2d1f14;
+  font-family: 'Times New Roman', 'Georgia', serif;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%238b4513' viewBox='0 0 20 20'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 6px center;
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+  cursor: pointer;
+}
+
+.medieval-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.5);
+}
+
+/* Medieval range slider */
+.medieval-slider {
+  appearance: none;
+  height: 8px;
+  background: linear-gradient(180deg, #654321 0%, #4a2f15 100%);
+  border: 1px solid #3a1f0a;
+  border-radius: 4px;
+}
+
+.medieval-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 20px;
+  background: linear-gradient(180deg, #c9a227 0%, #8b6914 100%);
+  border: 2px solid #654321;
+  border-radius: 3px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.medieval-slider::-moz-range-thumb {
+  width: 16px;
+  height: 20px;
+  background: linear-gradient(180deg, #c9a227 0%, #8b6914 100%);
+  border: 2px solid #654321;
+  border-radius: 3px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Medieval text colors */
+.medieval-text {
+  color: #2d1f14;
+  font-family: 'Times New Roman', 'Georgia', serif;
+}
+
+.medieval-text-muted {
+  color: #4a3728;
+}
+
+.medieval-text-gold {
+  color: #c9a227;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+ * YAML PREVIEW EDITOR STYLES
+ * ============================================
+ * Monaco Editor line highlighting for YAML preview panel
+ * Used when auto-scrolling to selected node's YAML section
+ */
+
+/* Line highlight animation for selected node */
+.yaml-highlight-line {
+  background-color: rgba(239, 68, 68, 0.2) !important; /* red-500/20 - matches primary theme */
+  animation: yaml-highlight-fade 2s ease-out forwards;
+}
+
+@keyframes yaml-highlight-fade {
+  0% {
+    background-color: rgba(239, 68, 68, 0.3); /* red-500/30 */
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Glyph margin indicator for highlighted line */
+.yaml-highlight-glyph {
+  background-color: var(--color-primary);
+  width: 3px !important;
+  margin-left: 3px;
+  border-radius: 1px;
+}

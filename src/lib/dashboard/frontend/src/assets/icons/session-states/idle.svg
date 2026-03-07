@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Dim circle with subtle checkmark - gray -->
+  <circle cx="32" cy="32" r="20" fill="none" stroke="#6b7280" stroke-width="3" opacity="0.6"/>
+  <polyline points="22,32 30,40 44,24" fill="none" stroke="#6b7280" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+</svg>

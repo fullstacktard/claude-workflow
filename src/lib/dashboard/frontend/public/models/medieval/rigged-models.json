@@ -1,0 +1,102 @@
+{
+  "version": "1.0.0",
+  "description": "Rigged medieval character models with animations (processed via Meshy API)",
+  "heightMeters": 1.7,
+  "animations": ["idle", "walk", "run"],
+  "characters": {
+    "knight": {
+      "rigged": "rigged/knight/knight_rigged.glb",
+      "walk": "rigged/knight/knight_walk.glb",
+      "run": "rigged/knight/knight_run.glb",
+      "scale": 1.0,
+      "description": "Armored knight character"
+    },
+    "wizard": {
+      "rigged": "rigged/wizard/wizard_rigged.glb",
+      "walk": "rigged/wizard/wizard_walk.glb",
+      "run": "rigged/wizard/wizard_run.glb",
+      "scale": 1.0,
+      "description": "Robed wizard character"
+    },
+    "blacksmith": {
+      "rigged": "rigged/blacksmith/blacksmith_rigged.glb",
+      "walk": "rigged/blacksmith/blacksmith_walk.glb",
+      "run": "rigged/blacksmith/blacksmith_run.glb",
+      "scale": 1.0,
+      "description": "Blacksmith craftsman"
+    },
+    "peasant_man": {
+      "rigged": "rigged/peasant_man/peasant_man_rigged.glb",
+      "walk": "rigged/peasant_man/peasant_man_walk.glb",
+      "run": "rigged/peasant_man/peasant_man_run.glb",
+      "scale": 1.0,
+      "description": "Male peasant villager"
+    },
+    "peasant_woman": {
+      "rigged": "rigged/peasant_woman/peasant_woman_rigged.glb",
+      "walk": "rigged/peasant_woman/peasant_woman_walk.glb",
+      "run": "rigged/peasant_woman/peasant_woman_run.glb",
+      "scale": 1.0,
+      "description": "Female peasant villager"
+    },
+    "merchant": {
+      "rigged": "rigged/merchant/merchant_rigged.glb",
+      "walk": "rigged/merchant/merchant_walk.glb",
+      "run": "rigged/merchant/merchant_run.glb",
+      "scale": 1.0,
+      "description": "Traveling merchant"
+    },
+    "guard": {
+      "rigged": "rigged/guard/guard_rigged.glb",
+      "walk": "rigged/guard/guard_walk.glb",
+      "run": "rigged/guard/guard_run.glb",
+      "scale": 1.0,
+      "description": "Town guard"
+    },
+    "monk": {
+      "rigged": "rigged/monk/monk_rigged.glb",
+      "walk": "rigged/monk/monk_walk.glb",
+      "run": "rigged/monk/monk_run.glb",
+      "scale": 1.0,
+      "description": "Hooded monk"
+    },
+    "bard": {
+      "rigged": "rigged/bard/bard_rigged.glb",
+      "walk": "rigged/bard/bard_walk.glb",
+      "run": "rigged/bard/bard_run.glb",
+      "scale": 1.0,
+      "description": "Traveling bard"
+    },
+    "yakub": {
+      "rigged": "rigged/yakub/yakub_rigged.glb",
+      "walk": "rigged/yakub/yakub_walk.glb",
+      "run": "rigged/yakub/yakub_run.glb",
+      "scale": 1.0,
+      "description": "Default character (Yakub)"
+    },
+    "jocker": {
+      "rigged": "rigged/jocker/jocker_rigged.glb",
+      "walk": "rigged/jocker/jocker_walk.glb",
+      "run": "rigged/jocker/jocker_run.glb",
+      "scale": 1.0,
+      "description": "Jocker character (debugger)"
+    },
+    "shrek": {
+      "rigged": "rigged/shrek/shrek_rigged.glb",
+      "walk": "rigged/shrek/shrek_walk.glb",
+      "run": "rigged/shrek/shrek_run.glb",
+      "scale": 1.0,
+      "description": "Shrek character (backend-engineer)"
+    }
+  },
+  "agentTypeMapping": {
+    "frontend-engineer": "wizard",
+    "backend-engineer": "blacksmith",
+    "devops-engineer": "guard",
+    "qa-engineer": "knight",
+    "research": "monk",
+    "cto-architect": "merchant",
+    "debugger": "bard",
+    "default": "yakub"
+  }
+}

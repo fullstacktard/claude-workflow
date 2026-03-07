@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "chrome-devtools": {
+      "command": "timeout",
+      "args": ["7200", "npx", "-y", "chrome-devtools-mcp@latest", "--browserUrl=http://localhost:9222"]
+    }
+  },
+  "_comments": {
+    "local_servers": "context7 and chrome-devtools run locally via npx",
+    "chrome_devtools_setup": "Chrome must be running with remote debugging enabled. On Windows: chrome.exe --remote-debugging-port=9222 --user-data-dir=C:\\chrome-dev-profile. For WSL: ensure networkingMode=mirrored in .wslconfig or use Windows host IP",
+    "proxy_setup": "For additional MCPs (exa, ref-tools, meshy, v0, replicate, cloudflare), run the Docker mcp-proxy container and add: \"mcp-proxy\": { \"type\": \"http\", \"url\": \"http://localhost:3847\" }",
+    "meshy_setup": "Meshy AI (auto-rigging, animation) requires MESHY_API_KEY. Get your API key from https://www.meshy.ai/api"
+  }
+}

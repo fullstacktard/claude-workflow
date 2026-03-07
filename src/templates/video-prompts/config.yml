@@ -1,0 +1,5 @@
+project_name: "video-prompts"
+default_status: "Draft"
+statuses: ["Draft", "Ready", "Rendering", "Done", "Failed"]
+prefix: "video"
+date_format: yyyy-mm-dd

@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "workflow-aggregator-output",
+  "title": "Workflow Aggregator Agent Output Schema",
+  "description": "JSON output schema for workflow-aggregator agent. Extends agent-output-base.schema.json using allOf composition.",
+  "allOf": [
+    { "$ref": "../templates/.claude/schemas/agent-output-base.schema.json" }
+  ],
+  "type": "object",
+  "properties": {
+    "agent_type": {
+      "type": "string",
+      "enum": ["architecture"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "failure", "partial", "blocked", "skipped"],
+      "default": "success"
+    },
+    "nextAction": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["spawn_agent", "none"] },
+        "agent_name": { "type": "string" },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"], "default": "medium" },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "phase_id": { "type": "string" },
+            "count": { "type": "number", "minimum": 1 },
+            "workflow_id": { "type": "string" },
+            "iteration": { "type": "number", "minimum": 1 },
+            "count_strategy": { "type": "string", "enum": ["from_previous", "failed_only", "custom_count"] }
+          }
+        }
+      },
+      "required": ["type"]
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "execution_time_ms": { "type": "number", "minimum": 0 },
+        "context_sources": { "type": "array", "items": { "type": "string" } },
+        "tools_used": { "type": "array", "items": { "type": "string" } },
+        "decision_reasoning": { "type": "string" }
+      }
+    },
+    "results": {
+      "type": "object",
+      "description": "Workflow aggregator specific results - phase transition data",
+      "properties": {
+        "agent_type": {
+          "type": "string",
+          "const": "architecture"
+        },
+        "phase_transition": {
+          "type": "object",
+          "description": "Phase transition decision data",
+          "properties": {
+            "from_phase": { "type": "string" },
+            "to_phase": { "type": ["string", "null"] },
+            "condition_matched": { "type": "string", "enum": ["any_failed", "all_passed", "partial_success", "none"] },
+            "reason": { "type": "string" },
+            "is_loop": { "type": "boolean" }
+          },
+          "required": ["from_phase", "to_phase", "reason", "is_loop"]
+        }
+      },
+      "required": ["agent_type", "phase_transition"]
+    }
+  }
+}
